@@ -2,6 +2,7 @@
 
 export(imf_codelist)
 export(imf_codes)
+export(imf_data)
 export(imf_ids)
 importFrom(dplyr,"%>%")
 importFrom(httr,GET)

@@ -22,7 +22,7 @@ Retrieve individual database codes
 }
 \examples{
 # Retrieve indicators from BOP database
-imf_codes(codelist = 'CL_INDICATOR|BOP')
+test = imf_codes(codelist = 'CL_INDICATOR|BOP')
 
 }
 

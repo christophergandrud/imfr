@@ -54,7 +54,7 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
 
     URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/%s',
                     database_id)
-    raw_dl <- imfr:::download_parse(URL)
+    raw_dl <- download_parse(URL)
 
     if (!isTRUE(return_raw)) {
         codelist <- raw_dl$Structure$CodeLists$CodeList$`@id`
@@ -80,7 +80,7 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
 #'
 #' @examples
 #' # Retrieve indicators from BOP database
-#' imf_codes(codelist = 'CL_INDICATOR|BOP')
+#' test = imf_codes(codelist = 'CL_INDICATOR|BOP')
 #'
 #' @export
 
@@ -91,7 +91,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 
     URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/%s',
                    codelist)
-    raw_dl <- imfr:::download_parse(URL)
+    raw_dl <- download_parse(URL)
 
     if (!isTRUE(return_raw)) {
         codes <- raw_dl$Structure$CodeLists$CodeList$Code$`@value`
@@ -102,4 +102,45 @@ imf_codes <- function(codelist, return_raw = FALSE) {
         return(codes_df)
     }
     else return(raw_dl)
+}
+
+#' Download an data from the IMF
+#'
+#' @param database_id character string database ID. Can be found using
+#' \code{\link{imf_ids}}.
+#' @param indicator character string indicator ID. Can be found using
+#' \code{\link{imf_codes}}.
+#' @param country character string or character vector of ISO two letter
+#' country codes identifying the countries for which you would like to
+#' download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
+#' @param start time point for which you would like to start gathering the data.
+#' @param end time point for which you would like to end gathering the data.
+#'
+#' @examples
+#' \dontrun{
+#' # Download Real Effective Exchange Rate (CPI base) for the UK and China
+#' real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
+#'                country = c('CN', 'GB'))
+#' }
+#'
+#' @export
+
+
+#database_id = 'IFS'
+#indicator = 'EREER_IX'
+#country = c('CN', 'GB')
+#start = 2012
+#end = 2012
+
+imf_data <- function(database_id, indicator, country, start = 2000, end = 2013)
+{
+
+    # ALL countries?
+    if (length(country) > 1) country <- paste(country, sep = '', collapse = '+')
+
+    URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
+                   database_id, country, indicator, start, end)
+    raw_dl <- imfr:::download_parse(URL)
+
+    return(raw_dl)
 }
