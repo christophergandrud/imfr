@@ -136,8 +136,9 @@ imf_data <- function(database_id, indicator, country, start = 2000, end = 2013)
 {
 
     # ALL countries?
-    if (length(country) > 1) country <- paste(country, sep = '', collapse = '+')
+    country <- paste(country, sep = '', collapse = '+')
 
+    # TODO: loop for multiple variables--Or check if more than one indicator can be included
     URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
                    database_id, country, indicator, start, end)
     raw_dl <- imfr:::download_parse(URL)
