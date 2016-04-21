@@ -160,11 +160,12 @@ imf_data <- function(database_id, indicator, country = 'all',
                                    indicator = indicator, country = country,
                                    start = start, end = end,
                                    freq = freq, return_raw = return_raw)
+        if (nrow(one_series) == 0) stop('No data found.', call. = FALSE)
         return(one_series)
     }
     else if (length(indicator) > 1) {
         for (i in indicator) {
-            temp <- imfr:::imf_data_one(database_id = database_id,
+            temp <- imf_data_one(database_id = database_id,
                                  indicator = i,
                                  country = country, start = start, end = end,
                                  freq = freq, return_raw = return_raw)
@@ -178,6 +179,7 @@ imf_data <- function(database_id, indicator, country = 'all',
            # }
             if (!isTRUE(last_element(i, indicator))) Sys.sleep(2)
         }
+        if (nrow(combined) == 0) stop('No data found.', call. = FALSE)
         return(combined)
     }
 }

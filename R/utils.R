@@ -41,41 +41,41 @@ imf_data_one <- function(database_id, indicator, country, start,
 
         # Extract requested series
         observations <- raw_dl$CompactData$DataSet$Series$Obs
+        if (!is.null(observations)) {
+            series_pos <- grep(freq, available_freq)
+            all <- 1:length(observations)
+            not_null <- all[sapply(observations, isnt.null)]
+            series_pos <- series_pos[series_pos %in% not_null]
 
-        series_pos <- grep(freq, available_freq)
-        all <- 1:length(observations)
-        not_null <- all[sapply(observations, isnt.null)]
-        series_pos <- series_pos[series_pos %in% not_null]
+            countries <- overview$`@REF_AREA`[series_pos]
+            sub_data <- observations[series_pos]
 
-        countries <- overview$`@REF_AREA`[series_pos]
-        sub_data <- observations[series_pos]
+            sub_data <- sub_data %>%
+                lapply(as.data.frame, stringsAsFactors = FALSE) %>%
+                Map(cbind, ., iso2c = countries) %>%
+                do.call(rbind.data.frame, .) %>%
+                MoveFront('iso2c')
 
-        sub_data <- sub_data %>%
-            lapply(as.data.frame, stringsAsFactors = FALSE) %>%
-            Map(cbind, ., iso2c = countries) %>%
-            do.call(rbind.data.frame, .) %>%
-            MoveFront('iso2c')
+            # Final clean up
+            if (freq == 'A') {
+                names(sub_data) <- c('iso2c', 'year', indicator)
+            }
+            else if (freq == 'Q') {
+                names(sub_data) <- c('iso2c', 'year_quarter', indicator)
+            }
+            else if (freq == 'M') {
+                names(sub_data) <- c('iso2c', 'year_month', indicator)
+            }
 
-        # Final clean up
-        if (freq == 'A') {
-            names(sub_data) <- c('iso2c', 'year', indicator)
+            sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
+            sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
+
+            comb_dl <- rbind(comb_dl, sub_data)
+
+            if (!isTRUE(last_element(u, 1:length(country)))) Sys.sleep(2)
+            }
+            if (nrow(comb_dl) >= 1) comb_dl <- comb_dl[order(comb_dl$iso2c), ]
         }
-        else if (freq == 'Q') {
-            names(sub_data) <- c('iso2c', 'year_quarter', indicator)
-        }
-        else if (freq == 'M') {
-            names(sub_data) <- c('iso2c', 'year_month', indicator)
-        }
-
-        sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
-        sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
-
-        comb_dl <- rbind(comb_dl, sub_data)
-
-        if (!isTRUE(last_element(u, 1:length(country)))) Sys.sleep(2)
-    }
-        if (nrow(comb_dl) >= 1) comb_dl <- comb_dl[order(comb_dl$iso2c), ]
-
         return(comb_dl)
 }
 
@@ -166,7 +166,7 @@ last_element <- function(x, v)
 #' @noRd
 
 all_iso2c <- function() {
-    all <- read.csv('data/all_iso.csv', stringsAsFactors = FALSE)
+    all <- imfr::all_iso2c
     return(all[, 1])
 }
 
