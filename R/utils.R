@@ -14,47 +14,58 @@ imf_data_one <- function(database_id, indicator, country, start,
                                             call. = FALSE)
 
     # Download
-    country <- paste(country, sep = '', collapse = '+')
-    URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
-                   database_id, country, indicator, start, end)
-    raw_dl <- download_parse(URL)
+    ## Address IMF download limit on individual call
+    country <- split(country, ceiling(seq_along(country) / 60))
+    comb_dl <- data.frame()
+    for (u in 1:length(country)) {
+        country_sub <- country[u] %>% unlist
+        country_sub <- paste(country_sub, sep = '', collapse = '+')
+        URL <- sprintf(
+            'http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
+            database_id, country_sub, indicator, start, end)
+        raw_dl <- download_parse(URL)
 
-    if (isTRUE(return_raw)) {
-        return(raw_dl)
-    } else
-        # Check if requested indicator and frequency is available
-        overview <- raw_dl$CompactData$DataSet$Series
-        if (is.null(overview)) stop(sprintf(
-            '%s is not available for your query.', indicator), call. = FALSE)
+        if (isTRUE(return_raw)) {
+            return(raw_dl)
+        } else
+            # Check if requested indicator and frequency is available
+            overview <- raw_dl$CompactData$DataSet$Series
+            if (is.null(overview)) stop(sprintf(
+                '%s is not available for your query.', indicator),
+                call. = FALSE)
 
-        available_freq <- overview$`@FREQ`
-        if (!(freq %in% available_freq)) stop(sprintf(
-                '%s is not available in the requested frequency', indicator),
-                                          call. = FALSE)
+            available_freq <- overview$`@FREQ`
+            if (!(freq %in% available_freq)) stop(sprintf(
+                    '%s is not available in the requested frequency', indicator),
+                                              call. = FALSE)
 
-    # Extract requested series
-    series_pos <-grep(freq, available_freq)
-    countries <- overview$`@REF_AREA`[series_pos] %>% as.list
-    sub_data <- raw_dl$CompactData$DataSet$Series$Obs[series_pos] %>%
-        lapply(as.data.frame, stringsAsFactors = FALSE) %>%
-        Map(cbind, ., iso2c = countries) %>%
-        do.call(rbind.data.frame, .) %>%
-        MoveFront('iso2c')
+        # Extract requested series
+        series_pos <-grep(freq, available_freq)
+        countries <- overview$`@REF_AREA`[series_pos] %>% as.list
+        sub_data <- raw_dl$CompactData$DataSet$Series$Obs[series_pos] %>%
+                        lapply(as.data.frame, stringsAsFactors = FALSE) %>%
+                        Map(cbind, ., iso2c = countries) %>%
+                        do.call(rbind.data.frame, .) %>%
+                        MoveFront('iso2c')
 
-    # Final clean up
-    if (freq == 'A') {
-        names(sub_data) <- c('iso2c', 'year', indicator)
+        # Final clean up
+        if (freq == 'A') {
+            names(sub_data) <- c('iso2c', 'year', indicator)
+        }
+        else if (freq == 'Q') {
+            names(sub_data) <- c('iso2c', 'year_quarter', indicator)
+        }
+        else if (freq == 'M') {
+            names(sub_data) <- c('iso2c', 'year_month', indicator)
+        }
+        sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
+        sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
+
+        comb_dl <- rbind(comb_dl, sub_data)
+        if (!isTRUE(last_element(u, 1:length(country)))) Sys.sleep(2)
     }
-    else if (freq == 'Q') {
-        names(sub_data) <- c('iso2c', 'year_quarter', indicator)
-    }
-    else if (freq == 'M') {
-        names(sub_data) <- c('iso2c', 'year_month', indicator)
-    }
-    sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
-    sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
-
-    return(sub_data)
+    comb_dl <- comb_dl[order(comb_dl$iso2c), ]
+    return(comb_dl)
 }
 
 
@@ -71,6 +82,14 @@ download_parse <- function(URL) {
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {
         stop('data.imf.org appears to be down.', call. = FALSE)
+    }
+
+    if (grepl('<!DOCTYPE HTML PUBLIC', raw_download)) {
+        stop('Unable to download series.', call. = FALSE)
+    }
+
+    if (grepl('<!DOCTYPE html>', raw_download)) {
+        stop('Unable to download series.', call. = FALSE)
     }
 
     if (grepl('<string xmlns="http://schemas.m', raw_download)) {
@@ -103,7 +122,8 @@ MoveFront <- function(data, Var, exact = TRUE, ignore.case = NULL, fixed = NULL)
             col_idx <- which(DataNames %in% Var, arr.ind = TRUE)
         }
         else if (!isTRUE(exact)){
-            col_idx <- grep(Var, DataNames, ignore.case = ignore.case, fixed = fixed)
+            col_idx <- grep(Var, DataNames, ignore.case = ignore.case,
+                            fixed = fixed)
         }
         MovedData <- data[, c(col_idx, (1:ncol(data))[-col_idx])]
         return(MovedData)
@@ -127,4 +147,14 @@ last_element <- function(x, v)
     v_final <- length(v)
     if (x_position == v_final) return(TRUE)
     else return(FALSE)
+}
+
+
+#' All ISO2C codes
+#'
+#' @noRd
+
+all_iso2c <- function() {
+    all <- read.csv('data/all_iso.csv', stringsAsFactors = FALSE)
+    return(all[, 1])
 }

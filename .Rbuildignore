@@ -3,3 +3,4 @@
 .Rmd$
 .html$
 .travis.yml
+data/all_iso.csv

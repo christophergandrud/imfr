@@ -52,8 +52,9 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
         stop('Must supply database_id.\n\nUse imf_ids to find.',
              call. = FALSE)
 
-    URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/%s',
-                    database_id)
+    URL <- sprintf(
+            'http://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/%s',
+            database_id)
     raw_dl <- download_parse(URL)
 
     if (!isTRUE(return_raw)) {
@@ -113,6 +114,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #' @param country character string or character vector of ISO two letter
 #' country codes identifying the countries for which you would like to
 #' download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
+#' If \code{country = 'all'} then all available countries will be downloaded.
 #' @param start year for which you would like to start gathering the data.
 #' @param end year for which you would like to end gathering the data.
 #' @param freq character string indicating the series frequency. With
@@ -141,16 +143,20 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #'
 #' @export
 
-imf_data <- function(database_id, indicator, country, start = 2000, end = 2013,
+imf_data <- function(database_id, indicator, country = 'all',
+                     start = 2000, end = 2013,
                      freq = 'A', return_raw = FALSE)
 {
     if (length(indicator) > 1 & isTRUE(return_raw))
         stop('return_raw will only work with on indicator at a time',
              call. = FALSE)
 
+    if (country == 'all') country <- all_iso2c()
+
     if (length(indicator) == 1) {
-        one_series <- imf_data_one(database_id = database_id, indicator = indicator,
-                                   country = country, start = start, end = end,
+        one_series <- imf_data_one(database_id = database_id,
+                                   indicator = indicator, country = country,
+                                   start = start, end = end,
                                    freq = freq, return_raw = return_raw)
         return(one_series)
     }

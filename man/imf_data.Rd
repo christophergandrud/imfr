@@ -4,8 +4,8 @@
 \alias{imf_data}
 \title{Download an data from the IMF}
 \usage{
-imf_data(database_id, indicator, country, start = 2000, end = 2013,
-  freq = "A", return_raw = FALSE)
+imf_data(database_id, indicator, country = "all", start = 2000,
+  end = 2013, freq = "A", return_raw = FALSE)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
@@ -16,7 +16,8 @@ These can be found using \code{\link{imf_codes}}.}
 
 \item{country}{character string or character vector of ISO two letter
 country codes identifying the countries for which you would like to
-download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.}
+download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
+If \code{country = 'all'} then all available countries will be downloaded.}
 
 \item{start}{year for which you would like to start gathering the data.}
 

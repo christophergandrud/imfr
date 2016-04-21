@@ -19,7 +19,7 @@ You can use the `imf_data` function to download the data the IMF makes available
 
     *Tip*: if you have a number of country identifiers that are not in ISO2C format, you can use the helpful [countrycode](https://cran.r-project.org/web/packages/countrycode/index.html) package to convert them.
 
-- `country`: one or more [ISO two letter country codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for the countries you would like to download the data for.
+- `country`: one or more [ISO two letter country codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for the countries you would like to download the data for. If `country = 'all'` then all available countries will be downloaded.
 
 - `start` and `end`: the start and end years for which you would like to download the data.
 
@@ -47,6 +47,6 @@ real_ex
 
 ```
 ##   iso2c year EREER_IX
-## 1    GB 2013 105.7741
 ## 2    CN 2013 115.4556
+## 1    GB 2013 105.7741
 ```
