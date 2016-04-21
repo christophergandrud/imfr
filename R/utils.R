@@ -23,7 +23,7 @@ imf_data_one <- function(database_id, indicator, country, start,
         URL <- sprintf(
             'http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
             database_id, country_sub, indicator, start, end)
-        raw_dl <- imfr:::download_parse(URL)
+        raw_dl <- download_parse(URL)
 
         if (isTRUE(return_raw)) {
             return(raw_dl)
