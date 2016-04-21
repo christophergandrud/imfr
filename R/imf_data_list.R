@@ -148,6 +148,13 @@ imf_data <- function(database_id, indicator, country, start = 2000, end = 2013,
 
     # ALL countries?
     country <- paste(country, sep = '', collapse = '+')
+    if (length(indicator > 1)) {
+        indicator <- indicator[1]
+        warning(sprintf(
+            'Currently only one indicator at a time can be downloaded.\n\nOnly attempted to download %s.',
+            indicator), call. = FALSE)
+    }
+    #indicator <- paste(indicator, sep = '', collapse = '+')
 
     # TODO: loop for multiple variables--Or check if more than one indicator can be included
     URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',

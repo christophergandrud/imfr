@@ -13,6 +13,10 @@ download_parse <- function(URL) {
         stop('data.imf.org appears to be down.', call. = FALSE)
     }
 
+    if (grepl('<string xmlns="http://schemas.m', raw_download)) {
+        stop("Unable to find what you're looking for.", call. = FALSE)
+    }
+
     json_parsed <- fromJSON(raw_download)
     return(json_parsed)
 }

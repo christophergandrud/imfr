@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 .Rmd$
 .html$
+.travis.yml
