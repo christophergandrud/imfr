@@ -108,8 +108,8 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #'
 #' @param database_id character string database ID. Can be found using
 #' \code{\link{imf_ids}}.
-#' @param indicator character string indicator ID. Can be found using
-#' \code{\link{imf_codes}}.
+#' @param indicator character string or character vector of indicator IDs.
+#' These can be found using \code{\link{imf_codes}}.
 #' @param country character string or character vector of ISO two letter
 #' country codes identifying the countries for which you would like to
 #' download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
@@ -122,7 +122,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #'
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with just the
-#' requested data series is returned. If \code{return_raw = TRUE} then the raw
+#' requested data series are returned. If \code{return_raw = TRUE} then the raw
 #' data list is returned. This can include additional information about the
 #' series.
 #'
@@ -132,6 +132,10 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #' real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
 #'                country = c('CN', 'GB'), freq = 'M')
 #'
+#' # Also download Interest Rates, Lending Rate, Percent per annum
+#' ex_interest <- imf_data(database_id = 'IFS',
+#'                          indicator = c('FILR_PA', 'EREER_IX'),
+#'                          country = c('CN', 'GB'), freq = 'A')
 #'
 #' @importFrom magrittr %>%
 #'
@@ -140,57 +144,32 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 imf_data <- function(database_id, indicator, country, start = 2000, end = 2013,
                      freq = 'A', return_raw = FALSE)
 {
-    . <- NULL
+    if (length(indicator) > 1 & isTRUE(return_raw))
+        stop('return_raw will only work with on indicator at a time',
+             call. = FALSE)
 
-    # Sanity check
-    if (!(freq %in% c('A', 'Q', 'M'))) stop("freq must be 'A', 'Q', or 'M'.",
-                                            call. = FALSE)
-
-    # ALL countries?
-    country <- paste(country, sep = '', collapse = '+')
-    if (length(indicator > 1)) {
-        indicator <- indicator[1]
-        warning(sprintf(
-            'Currently only one indicator at a time can be downloaded.\n\nOnly attempted to download %s.',
-            indicator), call. = FALSE)
+    if (length(indicator) == 1) {
+        one_series <- imf_data_one(database_id = database_id, indicator = indicator,
+                                   country = country, start = start, end = end,
+                                   freq = freq, return_raw = return_raw)
+        return(one_series)
     }
-    #indicator <- paste(indicator, sep = '', collapse = '+')
+    else if (length(indicator) > 1) {
+        for (i in indicator) {
+            temp <- imf_data_one(database_id = database_id,
+                                 indicator = i,
+                                 country = country, start = start, end = end,
+                                 freq = freq, return_raw = return_raw)
 
-    # TODO: loop for multiple variables--Or check if more than one indicator can be included
-    URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
-                   database_id, country, indicator, start, end)
-    raw_dl <- download_parse(URL)
+            if (grep(i, indicator) == 1) combined <- temp
+            else {
+                by_id <- names(temp)[1:2]
+                combined <- merge(combined, temp, by = by_id, all = TRUE)
+            }
 
-    if (isTRUE(return_raw)) {
-        return(raw_dl)
-    } else
-    # Check if requested frequency is available
-    overview <- raw_dl$CompactData$DataSet$Series
-    available_freq <- overview$`@FREQ`
-    if (!(freq %in% available_freq)) stop('Data series is not available in the requested frequency',
-                                            call. = FALSE)
 
-    # Extract requested series
-    series_pos <-grep(freq, available_freq)
-    countries <- overview$`@REF_AREA`[series_pos] %>% as.list
-    sub_data <- raw_dl$CompactData$DataSet$Series$Obs[series_pos] %>%
-                    lapply(as.data.frame, stringsAsFactors = FALSE) %>%
-                    Map(cbind, ., iso2c = countries) %>%
-                    do.call(rbind.data.frame, .) %>%
-                    MoveFront('iso2c')
-
-    # Final clean up
-    if (freq == 'A') {
-        names(sub_data) <- c('iso2c', 'year', indicator)
+            if (!isTRUE(last_element(i, indicator))) Sys.sleep(2)
+        }
+        return(combined)
     }
-    else if (freq == 'Q') {
-        names(sub_data) <- c('iso2c', 'year_quarter', indicator)
-    }
-    else if (freq == 'M') {
-        names(sub_data) <- c('iso2c', 'year_month', indicator)
-    }
-    sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
-    sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
-
-    return(sub_data)
 }

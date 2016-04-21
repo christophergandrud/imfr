@@ -11,12 +11,12 @@ You can use the `imf_data` function to download the data the IMF makes available
 
 - `database_id`: the ID of the specific database you wish to download the data series from. You can find the list of IDs and their description using the `imf_ids` function.
 
-- `indicator`: the IMF indicator of the variable you would like to download. To find this:
+- `indicator`: the IMF indicators of the variables you want to download. To find these by:
 
-    1. Once you have the `database_id` for the database you want to access, you can use the `imf_codelist` function to find the code list of the database. 
-    
-    2. Then using the indicator code (usually `CL_INDICATOR|database_id`) in `imf_codes`, you can find the data series indicator codes in that database. 
-    
+    1. Once you have the `database_id` for the database you want to access, you can use the `imf_codelist` function to find the code list of the database.
+
+    2. Then using the indicator code (usually `CL_INDICATOR|database_id`) in `imf_codes`, you can find the data series indicator codes in that database.
+
     *Tip*: if you have a number of country identifiers that are not in ISO2C format, you can use the helpful [countrycode](https://cran.r-project.org/web/packages/countrycode/index.html) package to convert them.
 
 - `country`: one or more [ISO two letter country codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for the countries you would like to download the data for.

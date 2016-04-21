@@ -11,7 +11,7 @@ You can use the `imf_data` function to download the data the IMF makes available
 
 - `database_id`: the ID of the specific database you wish to download the data series from. You can find the list of IDs and their description using the `imf_ids` function.
 
-- `indicator`: the IMF indicator of the variable you would like to download. To find this:
+- `indicator`: the IMF indicators of the variables you want to download. To find these by:
 
     1. Once you have the `database_id` for the database you want to access, you can use the `imf_codelist` function to find the code list of the database.
 

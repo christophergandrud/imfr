@@ -1,3 +1,63 @@
+#' Download one data series
+#'
+#' @importFrom magrittr %>%
+#'
+#' @noRd
+
+imf_data_one <- function(database_id, indicator, country, start,
+                         end, freq, return_raw)
+{
+    . <- NULL
+
+    # Sanity check
+    if (!(freq %in% c('A', 'Q', 'M'))) stop("freq must be 'A', 'Q', or 'M'.",
+                                            call. = FALSE)
+
+    # Download
+    country <- paste(country, sep = '', collapse = '+')
+    URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
+                   database_id, country, indicator, start, end)
+    raw_dl <- download_parse(URL)
+
+    if (isTRUE(return_raw)) {
+        return(raw_dl)
+    } else
+        # Check if requested indicator and frequency is available
+        overview <- raw_dl$CompactData$DataSet$Series
+        if (is.null(overview)) stop(sprintf(
+            '%s is not available for your query.', indicator), call. = FALSE)
+
+        available_freq <- overview$`@FREQ`
+        if (!(freq %in% available_freq)) stop(sprintf(
+                '%s is not available in the requested frequency', indicator),
+                                          call. = FALSE)
+
+    # Extract requested series
+    series_pos <-grep(freq, available_freq)
+    countries <- overview$`@REF_AREA`[series_pos] %>% as.list
+    sub_data <- raw_dl$CompactData$DataSet$Series$Obs[series_pos] %>%
+        lapply(as.data.frame, stringsAsFactors = FALSE) %>%
+        Map(cbind, ., iso2c = countries) %>%
+        do.call(rbind.data.frame, .) %>%
+        MoveFront('iso2c')
+
+    # Final clean up
+    if (freq == 'A') {
+        names(sub_data) <- c('iso2c', 'year', indicator)
+    }
+    else if (freq == 'Q') {
+        names(sub_data) <- c('iso2c', 'year_quarter', indicator)
+    }
+    else if (freq == 'M') {
+        names(sub_data) <- c('iso2c', 'year_month', indicator)
+    }
+    sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
+    sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
+
+    return(sub_data)
+}
+
+
 #' Simplify downloading and parsing JSON content
 #'
 #' @importFrom httr GET content progress
@@ -55,4 +115,16 @@ MoveFront <- function(data, Var, exact = TRUE, ignore.case = NULL, fixed = NULL)
         data <- OneMove(data, i)
     }
     return(data)
+}
+
+#' Find last element of a vector
+#'
+#' @noRd
+
+last_element <- function(x, v)
+{
+    x_position <- match(x, v)
+    v_final <- length(v)
+    if (x_position == v_final) return(TRUE)
+    else return(FALSE)
 }
