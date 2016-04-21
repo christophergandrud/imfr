@@ -139,7 +139,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #'                          indicator = c('FILR_PA', 'EREER_IX'),
 #'                          country = c('CN', 'GB'), freq = 'A')
 #'
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 #'
 #' @export
 

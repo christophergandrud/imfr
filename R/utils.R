@@ -1,6 +1,6 @@
 #' Download one data series
 #'
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>% bind_rows
 #'
 #' @noRd
 
@@ -49,12 +49,15 @@ imf_data_one <- function(database_id, indicator, country, start,
 
             countries <- overview$`@REF_AREA`[series_pos]
             sub_data <- observations[series_pos]
+            suppressWarnings(
+                sub_data <- sub_data %>%
+                    lapply(as.data.frame, stringsAsFactors = FALSE) %>%
+                    Map(cbind, ., iso2c = countries) %>%
+                    do.call(bind_rows, .) %>%
+                    MoveFront('iso2c')
+            )
 
-            sub_data <- sub_data %>%
-                lapply(as.data.frame, stringsAsFactors = FALSE) %>%
-                Map(cbind, ., iso2c = countries) %>%
-                do.call(rbind.data.frame, .) %>%
-                MoveFront('iso2c')
+            sub_data <- sub_data[, 1:3]
 
             # Final clean up
             if (freq == 'A') {
@@ -83,7 +86,7 @@ imf_data_one <- function(database_id, indicator, country, start,
 #' Simplify downloading and parsing JSON content
 #'
 #' @importFrom httr GET content progress
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 #' @importFrom jsonlite fromJSON
 #' @noRd
 
@@ -172,4 +175,4 @@ all_iso2c <- function() {
 
 #' @noRd
 
-isnt.null = function(x)!is.null(x)
+isnt.null <- function(x)!is.null(x)
