@@ -3,7 +3,7 @@ imfr
 
 [![CRAN Version](http://www.r-pkg.org/badges/version/imfr)](http://cran.r-project.org/package=imfr) [![Build Status](https://travis-ci.org/christophergandrud/imfr.svg?branch=master)](https://travis-ci.org/christophergandrud/imfr)
 
-R package for interacting with the [International Monetary Funds's](http://data.imf.org/) [RESTful JSON API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service)
+R package for interacting with the [International Monetary Funds's](http://data.imf.org/) [RESTful JSON API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service).
 
 # How to download IMF data
 
@@ -11,9 +11,9 @@ You can use the `imf_data` function to download the data the IMF makes available
 
 - `database_id`: the ID of the specific database you wish to download the data series from. You can find the list of IDs and their description using the `imf_ids` function.
 
-- `indicator`: the IMF indicators of the variables you want to download. To find these by:
+- `indicator`: the IMF indicators of the variables you want to download. One way to find these is to:
 
-    1. Once you have the `database_id` for the database you want to access, you can use the `imf_codelist` function to find the code list of the database.
+    1. Use the `database_id` for the database you want to access with the `imf_codelist` function to find the code list of the database.
 
     2. Then using the indicator code (usually `CL_INDICATOR|database_id`) in `imf_codes`, you can find the data series indicator codes in that database.
 

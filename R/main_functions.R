@@ -151,7 +151,9 @@ imf_data <- function(database_id, indicator, country = 'all',
         stop('return_raw will only work with on indicator at a time',
              call. = FALSE)
 
-    if (country == 'all') country <- all_iso2c()
+    if (length(country) == 1) {
+        if (country == 'all') country <- all_iso2c()
+    }
 
     if (length(indicator) == 1) {
         one_series <- imf_data_one(database_id = database_id,
@@ -162,18 +164,18 @@ imf_data <- function(database_id, indicator, country = 'all',
     }
     else if (length(indicator) > 1) {
         for (i in indicator) {
-            temp <- imf_data_one(database_id = database_id,
+            temp <- imfr:::imf_data_one(database_id = database_id,
                                  indicator = i,
                                  country = country, start = start, end = end,
                                  freq = freq, return_raw = return_raw)
 
-            if (grep(i, indicator) == 1) combined <- temp
-            else {
-                by_id <- names(temp)[1:2]
-                combined <- merge(combined, temp, by = by_id, all = TRUE)
-            }
-
-
+           # if (!is.null(temp)) {
+                if (grep(i, indicator) == 1) combined <- temp
+                else {
+                    by_id <- names(temp)[1:2]
+                    combined <- merge(combined, temp, by = by_id, all = TRUE)
+                }
+           # }
             if (!isTRUE(last_element(i, indicator))) Sys.sleep(2)
         }
         return(combined)
