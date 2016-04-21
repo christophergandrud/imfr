@@ -131,6 +131,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #' @examples
 #' # Download Real Effective Exchange Rate (CPI base) for the UK and China
 #' # on a monthly basis
+#' \dontrun{
 #' real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
 #'                country = c('CN', 'GB'), freq = 'M')
 #'
@@ -138,7 +139,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #' ex_interest <- imf_data(database_id = 'IFS',
 #'                          indicator = c('FILR_PA', 'EREER_IX'),
 #'                          country = c('CN', 'GB'), freq = 'A')
-#'
+#' }
 #' @importFrom dplyr %>%
 #'
 #' @export
