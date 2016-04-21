@@ -31,7 +31,7 @@ imf_ids <- function(return_raw = FALSE) {
 #'
 #' @param database_id character string of a \code{database_id} from
 #' \code{\link{imf_ids}}.
-#' #' @param return_raw logical. Whether to return the raw data
+#' @param return_raw logical. Whether to return the raw data
 #' structure list or a data frame with codelist codes and descriptions.
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with the codelist IDs
@@ -39,7 +39,7 @@ imf_ids <- function(return_raw = FALSE) {
 #' data strcuture list is returned.
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' # Find Balance of Payments database data structure
 #' imf_codelist(database_id = 'BOP')
 #' }
@@ -71,7 +71,7 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
 #'
 #' @param codelist character string of a \code{codelist} from
 #' \code{\link{imf_codelist}}.
-#' #' @param return_raw logical. Whether to return the raw codes list
+#' @param return_raw logical. Whether to return the raw codes list
 #' list or a data frame with variable codes and descriptions.
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with the codes
@@ -113,27 +113,38 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #' @param country character string or character vector of ISO two letter
 #' country codes identifying the countries for which you would like to
 #' download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
-#' @param start time point for which you would like to start gathering the data.
-#' @param end time point for which you would like to end gathering the data.
+#' @param start year for which you would like to start gathering the data.
+#' @param end year for which you would like to end gathering the data.
+#' @param freq character string indicating the series frequency. With
+#' \code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.
+#' @param return_raw logical. Whether to return the data list
+#' a data frame with just the requested data series
+#'
+#'
+#' @return If \code{return_raw = FALSE} then a data frame with just the
+#' requested data series is returned. If \code{return_raw = TRUE} then the raw
+#' data list is returned. This can include additional information about the
+#' series.
 #'
 #' @examples
-#' \dontrun{
 #' # Download Real Effective Exchange Rate (CPI base) for the UK and China
+#' # on a monthly basis
 #' real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-#'                country = c('CN', 'GB'))
-#' }
+#'                country = c('CN', 'GB'), freq = 'M')
+#'
+#'
+#' @importFrom magrittr %>%
 #'
 #' @export
 
-
-#database_id = 'IFS'
-#indicator = 'EREER_IX'
-#country = c('CN', 'GB')
-#start = 2012
-#end = 2012
-
-imf_data <- function(database_id, indicator, country, start = 2000, end = 2013)
+imf_data <- function(database_id, indicator, country, start = 2000, end = 2013,
+                     freq = 'A', return_raw = FALSE)
 {
+    . <- NULL
+
+    # Sanity check
+    if (!(freq %in% c('A', 'Q', 'M'))) stop("freq must be 'A', 'Q', or 'M'.",
+                                            call. = FALSE)
 
     # ALL countries?
     country <- paste(country, sep = '', collapse = '+')
@@ -141,7 +152,38 @@ imf_data <- function(database_id, indicator, country, start = 2000, end = 2013)
     # TODO: loop for multiple variables--Or check if more than one indicator can be included
     URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
                    database_id, country, indicator, start, end)
-    raw_dl <- imfr:::download_parse(URL)
+    raw_dl <- download_parse(URL)
 
-    return(raw_dl)
+    if (isTRUE(return_raw)) {
+        return(raw_dl)
+    } else
+    # Check if requested frequency is available
+    overview <- raw_dl$CompactData$DataSet$Series
+    available_freq <- overview$`@FREQ`
+    if (!(freq %in% available_freq)) stop('Data series is not available in the requested frequency',
+                                            call. = FALSE)
+
+    # Extract requested series
+    series_pos <-grep(freq, available_freq)
+    countries <- overview$`@REF_AREA`[series_pos] %>% as.list
+    sub_data <- raw_dl$CompactData$DataSet$Series$Obs[series_pos] %>%
+                    lapply(as.data.frame, stringsAsFactors = FALSE) %>%
+                    Map(cbind, ., iso2c = countries) %>%
+                    do.call(rbind.data.frame, .) %>%
+                    MoveFront('iso2c')
+
+    # Final clean up
+    if (freq == 'A') {
+        names(sub_data) <- c('iso2c', 'year', indicator)
+    }
+    else if (freq == 'Q') {
+        names(sub_data) <- c('iso2c', 'year_quarter', indicator)
+    }
+    else if (freq == 'M') {
+        names(sub_data) <- c('iso2c', 'year_month', indicator)
+    }
+    sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
+    sub_data[, indicator] <- sub_data[, indicator] %>% as.numeric
+
+    return(sub_data)
 }

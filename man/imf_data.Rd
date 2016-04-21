@@ -4,7 +4,8 @@
 \alias{imf_data}
 \title{Download an data from the IMF}
 \usage{
-imf_data(database_id, indicator, country, start = 2000, end = 2013)
+imf_data(database_id, indicator, country, start = 2000, end = 2013,
+  freq = "A", return_raw = FALSE)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
@@ -17,19 +18,31 @@ imf_data(database_id, indicator, country, start = 2000, end = 2013)
 country codes identifying the countries for which you would like to
 download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.}
 
-\item{start}{time point for which you would like to start gathering the data.}
+\item{start}{year for which you would like to start gathering the data.}
 
-\item{end}{time point for which you would like to end gathering the data.}
+\item{end}{year for which you would like to end gathering the data.}
+
+\item{freq}{character string indicating the series frequency. With
+\code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.}
+
+\item{return_raw}{logical. Whether to return the data list
+a data frame with just the requested data series}
+}
+\value{
+If \code{return_raw = FALSE} then a data frame with just the
+requested data series is returned. If \code{return_raw = TRUE} then the raw
+data list is returned. This can include additional information about the
+series.
 }
 \description{
 Download an data from the IMF
 }
 \examples{
-\dontrun{
 # Download Real Effective Exchange Rate (CPI base) for the UK and China
+# on a monthly basis
 real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-               country = c('CN', 'GB'))
-}
+               country = c('CN', 'GB'), freq = 'M')
+
 
 }
 

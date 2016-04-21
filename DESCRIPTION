@@ -4,7 +4,7 @@ Title: Download data from the IMF's data service
 Version: 0.1.0
 Description: Explore and download data from the IMF's data service
     (http://data.imf.org/).
-Date: 2016-04-15
+Date: 2016-04-21
 Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
     role = c("aut", "cre"))
@@ -12,8 +12,8 @@ Authors@R: c(
 BugReports: https://github.com/christophergandrud/imfr/issues
 License: GPL (>= 3)
 Imports:
-    dplyr,
     httr,
-    jsonlite
+    jsonlite,
+    magrittr
 LazyData: TRUE
 RoxygenNote: 5.0.1

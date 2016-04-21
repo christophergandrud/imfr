@@ -8,8 +8,9 @@ imf_codelist(database_id, return_raw = FALSE)
 }
 \arguments{
 \item{database_id}{character string of a \code{database_id} from
-\code{\link{imf_ids}}.
-#' @param return_raw logical. Whether to return the raw data
+\code{\link{imf_ids}}.}
+
+\item{return_raw}{logical. Whether to return the raw data
 structure list or a data frame with codelist codes and descriptions.}
 }
 \value{
@@ -21,7 +22,7 @@ data strcuture list is returned.
 Retreive the list of codes (codelist) for of an individual IMF database.
 }
 \examples{
-#' \dontrun{
+\dontrun{
 # Find Balance of Payments database data structure
 imf_codelist(database_id = 'BOP')
 }

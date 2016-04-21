@@ -8,8 +8,9 @@ imf_codes(codelist, return_raw = FALSE)
 }
 \arguments{
 \item{codelist}{character string of a \code{codelist} from
-\code{\link{imf_codelist}}.
-#' @param return_raw logical. Whether to return the raw codes list
+\code{\link{imf_codelist}}.}
+
+\item{return_raw}{logical. Whether to return the raw codes list
 list or a data frame with variable codes and descriptions.}
 }
 \value{
