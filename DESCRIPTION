@@ -1,10 +1,10 @@
 Package: imfr
 Type: Package
-Title: Download data from the IMF's data service
+Title: Download Data From the International Monetary Fund's Data API
 Version: 0.1.0
-Description: Explore and download data from the IMF's data service
-    (http://data.imf.org/).
-Date: 2016-04-21
+Description: Explore and download data from the International Monetary Fund's
+    data API (http://data.imf.org/).
+Date: 2016-04-22
 Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
     role = c("aut", "cre"))
