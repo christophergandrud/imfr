@@ -173,6 +173,7 @@ all_iso2c <- function() {
     return(all[, 1])
 }
 
+#' Test if not NULL
 #' @noRd
 
 isnt.null <- function(x)!is.null(x)

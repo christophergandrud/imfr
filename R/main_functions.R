@@ -130,7 +130,7 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #'
 #' @examples
 #' # Download Real Effective Exchange Rate (CPI base) for the UK and China
-#' # on a monthly basis
+#' # at an annual frequency
 #' real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
 #'                country = c('CN', 'GB'), freq = 'A')
 #'
@@ -162,6 +162,7 @@ imf_data <- function(database_id, indicator, country = 'all',
                                    start = start, end = end,
                                    freq = freq, return_raw = return_raw)
         if (nrow(one_series) == 0) stop('No data found.', call. = FALSE)
+        rownames(one_series) <- NULL
         return(one_series)
     }
     else if (length(indicator) > 1) {
@@ -171,16 +172,15 @@ imf_data <- function(database_id, indicator, country = 'all',
                                  country = country, start = start, end = end,
                                  freq = freq, return_raw = return_raw)
 
-           # if (!is.null(temp)) {
                 if (grep(i, indicator) == 1) combined <- temp
                 else {
                     by_id <- names(temp)[1:2]
                     combined <- merge(combined, temp, by = by_id, all = TRUE)
                 }
-           # }
             if (!isTRUE(last_element(i, indicator))) Sys.sleep(2)
         }
         if (nrow(combined) == 0) stop('No data found.', call. = FALSE)
+        rownames(combined) <- NULL
         return(combined)
     }
 }

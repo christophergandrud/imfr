@@ -12,8 +12,8 @@ Authors@R: c(
 BugReports: https://github.com/christophergandrud/imfr/issues
 License: GPL (>= 3)
 Imports:
+    dplyr,
     httr,
-    jsonlite,
-    dplyr
+    jsonlite
 LazyData: TRUE
 RoxygenNote: 5.0.1

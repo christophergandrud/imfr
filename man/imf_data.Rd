@@ -40,7 +40,7 @@ Download an data from the IMF
 }
 \examples{
 # Download Real Effective Exchange Rate (CPI base) for the UK and China
-# on a monthly basis
+# at an annual frequency
 real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
                country = c('CN', 'GB'), freq = 'A')
 
