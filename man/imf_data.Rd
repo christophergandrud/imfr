@@ -41,14 +41,14 @@ Download an data from the IMF
 \examples{
 # Download Real Effective Exchange Rate (CPI base) for the UK and China
 # on a monthly basis
-\dontrun{
 real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-               country = c('CN', 'GB'), freq = 'M')
+               country = c('CN', 'GB'), freq = 'A')
 
+\dontrun{
 # Also download Interest Rates, Lending Rate, Percent per annum
 ex_interest <- imf_data(database_id = 'IFS',
                          indicator = c('FILR_PA', 'EREER_IX'),
-                         country = c('CN', 'GB'), freq = 'A')
+                         country = c('CN', 'GB'), freq = 'M')
 }
 }
 
