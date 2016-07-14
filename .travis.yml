@@ -1,2 +1,3 @@
 language: r
 cache: packages
+latex: false
