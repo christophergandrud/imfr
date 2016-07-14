@@ -15,7 +15,7 @@ You can use the `imf_data` function to download the data the IMF makes available
 
     1. Use the `database_id` for the database you want to access with the `imf_codelist` function to find the code list of the database.
 
-    2. Then using the indicator code (usually `CL_INDICATOR|database_id`) in `imf_codes`, you can find the data series indicator codes in that database.
+    2. Then using the indicator code (usually `CL_INDICATOR_database_id`) in `imf_codes`, you can find the data series indicator codes in that database.
 
     *Tip*: if you have a number of country identifiers that are not in ISO2C format, you can use the helpful [countrycode]( https://cran.r-project.org/package=countrycode) package to convert them.
 
@@ -47,6 +47,6 @@ real_ex
 
 ```
 ##   iso2c year EREER_IX
-## 1    CN 2013 115.4556
-## 2    GB 2013 105.7741
+## 1    CN 2013 115.2939
+## 2    GB 2013 105.7686
 ```
