@@ -51,7 +51,7 @@ real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
 # Also download Interest Rates, Lending Rate, Percent per annum
 ex_interest <- imf_data(database_id = 'IFS',
                          indicator = c('FILR_PA', 'EREER_IX'),
-                         country = c('CN', 'GB'), freq = 'M')
+                         freq = 'M')
 }
 }
 
