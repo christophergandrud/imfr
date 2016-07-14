@@ -10,6 +10,7 @@ imf_data_one <- function(database_id, indicator, country, start,
     . <- NULL
 
     # Sanity check
+    freq <- toupper(freq)
     if (!(freq %in% c('A', 'Q', 'M'))) stop("freq must be 'A', 'Q', or 'M'.",
                                             call. = FALSE)
 
