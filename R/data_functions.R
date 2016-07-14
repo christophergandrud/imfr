@@ -81,7 +81,7 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
 #'
 #' @examples
 #' # Retrieve indicators from BOP database
-#' test = imf_codes(codelist = 'CL_INDICATOR|BOP')
+#' test = imf_codes(codelist = 'CL_INDICATOR_BOP')
 #'
 #' @export
 
@@ -149,7 +149,7 @@ imf_data <- function(database_id, indicator, country = 'all',
                      freq = 'A', return_raw = FALSE)
 {
     if (length(indicator) > 1 & isTRUE(return_raw))
-        stop('return_raw will only work with on indicator at a time',
+        stop('return_raw only works with one indicator at a time',
              call. = FALSE)
 
     if (length(country) == 1) {

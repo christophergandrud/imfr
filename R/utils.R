@@ -26,6 +26,7 @@ imf_data_one <- function(database_id, indicator, country, start,
         raw_dl <- download_parse(URL)
 
         if (isTRUE(return_raw)) {
+            if (length(country) > 1) message('Only returning data for the first 60 countries.')
             return(raw_dl)
         } else
             # Check if requested indicator and frequency is available
@@ -85,13 +86,13 @@ imf_data_one <- function(database_id, indicator, country, start,
 
 #' Simplify downloading and parsing JSON content
 #'
-#' @importFrom httr GET content progress
+#' @importFrom httr RETRY content progress
 #' @importFrom dplyr %>%
 #' @importFrom jsonlite fromJSON
 #' @noRd
 
 download_parse <- function(URL) {
-    raw_download <- GET(URL, progress()) %>%
+    raw_download <- RETRY('GET', URL, progress()) %>%
         content(type = 'text', encoding = 'UTF-8')
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {
