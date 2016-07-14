@@ -92,8 +92,8 @@ imf_data_one <- function(database_id, indicator, country, start,
 #' @importFrom jsonlite fromJSON
 #' @noRd
 
-download_parse <- function(URL) {
-    raw_download <- RETRY('GET', URL, progress()) %>%
+download_parse <- function(URL, times = 3) {
+    raw_download <- RETRY('GET', URL, progress(), times = times) %>%
         content(type = 'text', encoding = 'UTF-8')
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {

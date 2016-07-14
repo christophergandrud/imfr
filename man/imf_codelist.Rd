@@ -4,7 +4,7 @@
 \alias{imf_codelist}
 \title{Retreive the list of codes (codelist) for of an individual IMF database.}
 \usage{
-imf_codelist(database_id, return_raw = FALSE)
+imf_codelist(database_id, return_raw = FALSE, times = 3)
 }
 \arguments{
 \item{database_id}{character string of a \code{database_id} from
@@ -12,6 +12,8 @@ imf_codelist(database_id, return_raw = FALSE)
 
 \item{return_raw}{logical. Whether to return the raw data
 structure list or a data frame with codelist codes and descriptions.}
+
+\item{times}{numeric. Maximum number of requests to attempt.}
 }
 \value{
 If \code{return_raw = FALSE} then a data frame with the codelist IDs

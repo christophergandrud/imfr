@@ -2,6 +2,7 @@
 #'
 #' @param return_raw logical. Whether to return the raw dataflow list or a
 #' data frame with database IDs and names.
+#' @param times numeric. Maximum number of requests to attempt.
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with the database IDs
 #' and descriptions is returned. If \code{return_raw = TRUE} then the raw
@@ -12,7 +13,7 @@
 #'
 #' @export
 
-imf_ids <- function(return_raw = FALSE) {
+imf_ids <- function(return_raw = FALSE, times = 3) {
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow/'
     raw_dl <- download_parse(URL)
 
@@ -33,6 +34,7 @@ imf_ids <- function(return_raw = FALSE) {
 #' \code{\link{imf_ids}}.
 #' @param return_raw logical. Whether to return the raw data
 #' structure list or a data frame with codelist codes and descriptions.
+#' @param times numeric. Maximum number of requests to attempt.
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with the codelist IDs
 #' and descriptions is returned. If \code{return_raw = TRUE} then the raw
@@ -47,7 +49,7 @@ imf_ids <- function(return_raw = FALSE) {
 #'
 #' @export
 
-imf_codelist <- function(database_id, return_raw = FALSE) {
+imf_codelist <- function(database_id, return_raw = FALSE, times = 3) {
     if (missing(database_id))
         stop('Must supply database_id.\n\nUse imf_ids to find.',
              call. = FALSE)
@@ -55,7 +57,7 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
     URL <- sprintf(
             'http://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/%s',
             database_id)
-    raw_dl <- download_parse(URL)
+    raw_dl <- download_parse(URL, times = times)
 
     if (!isTRUE(return_raw)) {
         codelist <- raw_dl$Structure$CodeLists$CodeList$`@id`
@@ -74,6 +76,7 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
 #' \code{\link{imf_codelist}}.
 #' @param return_raw logical. Whether to return the raw codes list
 #' list or a data frame with variable codes and descriptions.
+#' @param times numeric. Maximum number of requests to attempt.
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with the codes
 #' and descriptions is returned. If \code{return_raw = TRUE} then the raw
@@ -85,14 +88,14 @@ imf_codelist <- function(database_id, return_raw = FALSE) {
 #'
 #' @export
 
-imf_codes <- function(codelist, return_raw = FALSE) {
+imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
     if (missing(codelist))
         stop('Must supply codelist\n\nUse imf_codelist to find.',
              call. = FALSE)
 
     URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/%s',
                    codelist)
-    raw_dl <- download_parse(URL)
+    raw_dl <- download_parse(URL, times = times)
 
     if (!isTRUE(return_raw)) {
         codes <- raw_dl$Structure$CodeLists$CodeList$Code$`@value`
@@ -114,13 +117,15 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 #' @param country character string or character vector of ISO two letter
 #' country codes identifying the countries for which you would like to
 #' download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
-#' If \code{country = 'all'} then all available countries will be downloaded.
+#' If \code{country = 'all'} then \code{imf_data} will attempt to download
+#' all available countries.
 #' @param start year for which you would like to start gathering the data.
 #' @param end year for which you would like to end gathering the data.
 #' @param freq character string indicating the series frequency. With
 #' \code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.
 #' @param return_raw logical. Whether to return the data list
-#' a data frame with just the requested data series
+#' a data frame with just the requested data series.
+#' @param times numeric. Maximum number of requests to attempt.
 #'
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with just the
@@ -146,11 +151,14 @@ imf_codes <- function(codelist, return_raw = FALSE) {
 
 imf_data <- function(database_id, indicator, country = 'all',
                      start = 2000, end = 2013,
-                     freq = 'A', return_raw = FALSE)
+                     freq = 'A', return_raw = FALSE, times = 3)
 {
     if (length(indicator) > 1 & isTRUE(return_raw))
         stop('return_raw only works with one indicator at a time',
              call. = FALSE)
+
+    if (!is.vector(country)) stop('country must be a vector of iso2c country codes.',
+        call. = FALSE)
 
     if (length(country) == 1) {
         if (country == 'all') country <- all_iso2c()

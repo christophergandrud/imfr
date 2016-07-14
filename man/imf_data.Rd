@@ -5,7 +5,7 @@
 \title{Download an data from the IMF}
 \usage{
 imf_data(database_id, indicator, country = "all", start = 2000,
-  end = 2013, freq = "A", return_raw = FALSE)
+  end = 2013, freq = "A", return_raw = FALSE, times = 3)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
@@ -17,7 +17,8 @@ These can be found using \code{\link{imf_codes}}.}
 \item{country}{character string or character vector of ISO two letter
 country codes identifying the countries for which you would like to
 download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
-If \code{country = 'all'} then all available countries will be downloaded.}
+If \code{country = 'all'} then \code{imf_data} will attempt to download
+all available countries.}
 
 \item{start}{year for which you would like to start gathering the data.}
 
@@ -27,7 +28,9 @@ If \code{country = 'all'} then all available countries will be downloaded.}
 \code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.}
 
 \item{return_raw}{logical. Whether to return the data list
-a data frame with just the requested data series}
+a data frame with just the requested data series.}
+
+\item{times}{numeric. Maximum number of requests to attempt.}
 }
 \value{
 If \code{return_raw = FALSE} then a data frame with just the

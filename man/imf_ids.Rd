@@ -4,11 +4,13 @@
 \alias{imf_ids}
 \title{List imf database IDs}
 \usage{
-imf_ids(return_raw = FALSE)
+imf_ids(return_raw = FALSE, times = 3)
 }
 \arguments{
 \item{return_raw}{logical. Whether to return the raw dataflow list or a
 data frame with database IDs and names.}
+
+\item{times}{numeric. Maximum number of requests to attempt.}
 }
 \value{
 If \code{return_raw = FALSE} then a data frame with the database IDs

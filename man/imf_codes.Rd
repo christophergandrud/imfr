@@ -4,7 +4,7 @@
 \alias{imf_codes}
 \title{Retrieve individual database codes}
 \usage{
-imf_codes(codelist, return_raw = FALSE)
+imf_codes(codelist, return_raw = FALSE, times = 3)
 }
 \arguments{
 \item{codelist}{character string of a \code{codelist} from
@@ -12,6 +12,8 @@ imf_codes(codelist, return_raw = FALSE)
 
 \item{return_raw}{logical. Whether to return the raw codes list
 list or a data frame with variable codes and descriptions.}
+
+\item{times}{numeric. Maximum number of requests to attempt.}
 }
 \value{
 If \code{return_raw = FALSE} then a data frame with the codes
