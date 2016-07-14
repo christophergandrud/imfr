@@ -143,7 +143,7 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 #' # Also download Interest Rates, Lending Rate, Percent per annum
 #' ex_interest <- imf_data(database_id = 'IFS',
 #'                          indicator = c('FILR_PA', 'EREER_IX'),
-#'                          country = c('CN', 'GB'), freq = 'M')
+#'                          freq = 'M')
 #' }
 #' @importFrom dplyr %>%
 #'
@@ -160,8 +160,10 @@ imf_data <- function(database_id, indicator, country = 'all',
     if (!is.vector(country)) stop('country must be a vector of iso2c country codes.',
         call. = FALSE)
 
+    country <- toupper(country)
+
     if (length(country) == 1) {
-        if (country == 'all') country <- all_iso2c()
+        if (country == 'ALL') country <- all_iso2c()
     }
 
     if (length(indicator) == 1) {
