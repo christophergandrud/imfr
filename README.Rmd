@@ -1,7 +1,10 @@
 imfr
 ====================================
 
+[![CRAN Version](http://www.r-pkg.org/badges/version/imfr)](http://cran.r-project.org/package=imfr)
 [![Build Status](https://travis-ci.org/christophergandrud/imfr.svg?branch=master)](https://travis-ci.org/christophergandrud/imfr)
+![CRAN Monthly Downloads](http://cranlogs.r-pkg.org/badges/last-month/imfr)
+![CRAN Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/imfr)
 
 R package for interacting with the [International Monetary Funds's](http://data.imf.org/) [RESTful JSON API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service).
 
