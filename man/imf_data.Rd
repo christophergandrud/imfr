@@ -5,7 +5,8 @@
 \title{Download an data from the IMF}
 \usage{
 imf_data(database_id, indicator, country = "all", start = 2000,
-  end = 2013, freq = "A", return_raw = FALSE, times = 3)
+  end = 2013, freq = "A", return_raw = FALSE, print_url = FALSE,
+  times = 3)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
@@ -29,6 +30,9 @@ all available countries.}
 
 \item{return_raw}{logical. Whether to return the data list
 a data frame with just the requested data series.}
+
+\item{print_url}{logical. Whether to print the URL used in the API call.
+Can be useful for debugging.}
 
 \item{times}{numeric. Maximum number of requests to attempt.}
 }

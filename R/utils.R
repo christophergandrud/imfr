@@ -5,7 +5,7 @@
 #' @noRd
 
 imf_data_one <- function(database_id, indicator, country, start,
-                         end, freq, return_raw)
+                         end, freq, return_raw, print_url)
 {
     . <- NULL
 
@@ -24,6 +24,7 @@ imf_data_one <- function(database_id, indicator, country, start,
         URL <- sprintf(
             'http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/%s/%s.%s?startPeriod=%s&endPeriod=%s',
             database_id, country_sub, indicator, start, end)
+        if (print_url) message(sprintf('Attempting to download from: %s', URL))
         raw_dl <- download_parse(URL)
 
         if (isTRUE(return_raw)) {

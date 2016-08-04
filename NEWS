@@ -1,1 +1,6 @@
 # All updates will be detailed here
+
+## Version 0.1.1
+
+- `imf_data` now has an optional argument (`print_url`) that will print to the
+URL used in the API to the console. This can be useful for API debugging.
