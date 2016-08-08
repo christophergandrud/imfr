@@ -2,5 +2,10 @@
 
 ## Version 0.1.1
 
+- Updated URL GET request schema to meet changes introduced by the IMF on
+2016-07-27. These changes had broke `imf_data`, but the issue is now resolved.
+For more details on the API changes see:
+<http://data.imf.org/?sk=A329021F-1ED6-4D6E-B719-5BF5413923B6>.
+
 - `imf_data` now has an optional argument (`print_url`) that will print to the
 URL used in the API to the console. This can be useful for API debugging.
