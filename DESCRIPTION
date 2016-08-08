@@ -9,6 +9,7 @@ Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
     role = c("aut", "cre"))
     )
+URL: http://cran.r-project.org/package=imfr
 BugReports: https://github.com/christophergandrud/imfr/issues
 License: GPL (>= 3)
 Imports:
