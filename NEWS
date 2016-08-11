@@ -1,5 +1,9 @@
 # All updates will be detailed here
 
+## Version 0.1.2
+
+- Allow `imf_data` users to pass arguments to `RETRY` for data downloading. 
+
 ## Version 0.1.1
 
 - Updated URL GET request schema to meet changes introduced by the IMF on

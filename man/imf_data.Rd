@@ -6,7 +6,7 @@
 \usage{
 imf_data(database_id, indicator, country = "all", start = 2000,
   end = 2013, freq = "A", return_raw = FALSE, print_url = FALSE,
-  times = 3)
+  times = 3, ...)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
@@ -35,6 +35,8 @@ a data frame with just the requested data series.}
 Can be useful for debugging.}
 
 \item{times}{numeric. Maximum number of requests to attempt.}
+
+\item{...}{arguments to pass to \code{\link{RETRY}}.}
 }
 \value{
 If \code{return_raw = FALSE} then a data frame with just the

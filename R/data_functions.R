@@ -128,7 +128,7 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 #' @param print_url logical. Whether to print the URL used in the API call.
 #' Can be useful for debugging.
 #' @param times numeric. Maximum number of requests to attempt.
-#'
+#' @param ... arguments to pass to \code{\link{RETRY}}.
 #'
 #' @return If \code{return_raw = FALSE} then a data frame with just the
 #' requested data series are returned. If \code{return_raw = TRUE} then the raw
@@ -154,14 +154,14 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 imf_data <- function(database_id, indicator, country = 'all',
                      start = 2000, end = 2013,
                      freq = 'A', return_raw = FALSE, print_url = FALSE,
-                     times = 3)
+                     times = 3, ...)
 {
     if (length(indicator) > 1 & isTRUE(return_raw))
         stop('return_raw only works with one indicator at a time',
              call. = FALSE)
 
-    if (!is.vector(country)) stop('country must be a vector of iso2c country codes.',
-        call. = FALSE)
+    if (!is.vector(country))
+        stop('country must be a vector of iso2c country codes.', call. = FALSE)
 
     country <- toupper(country)
 
@@ -174,7 +174,7 @@ imf_data <- function(database_id, indicator, country = 'all',
                                    indicator = indicator, country = country,
                                    start = start, end = end,
                                    freq = freq, return_raw = return_raw,
-                                   print_url = print_url)
+                                   print_url = print_url, ...)
         if (nrow(one_series) == 0) stop('No data found.', call. = FALSE)
         rownames(one_series) <- NULL
         return(one_series)
