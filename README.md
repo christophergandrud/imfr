@@ -28,7 +28,9 @@ You can use the `imf_data` function to download the data the IMF makes available
 
 - `freq`: the frequency of the series you want to download. Often series are available annually, quarterly, and monthly.
 
-## Example
+## Examples
+
+### Simple Country-Time-Variable
 
 Imagine that we want to download Effective Exchange Rate (CPI base) for China and the UK for 2013:
 
@@ -50,6 +52,44 @@ real_ex
 
 ```
 ##   iso2c year EREER_IX
-## 1    CN 2013 115.2939
-## 2    GB 2013 105.7686
+## 1    CN 2013 115.2938
+## 2    GB 2013 105.7680
 ```
+
+### More complex data formats
+
+While many quantities of interest from the IMF database are in simple 
+country-time-variable format, many are not. For example, Direction of Trade 
+Statistics include country-year-variable and a "counterpart area". By default,
+`imf_data` would only return the first, but not the last. 
+
+Because of the many possible data structures available from the imf, `imf_data`
+allows you to return the entire API call as a list. From this list you can then
+extract the requested data. To do this use the `return_raw = TRUE` argument, e.g.:
+
+
+```r
+data_list <- imf_data(database_id = "DOT", indicator = "TXG_FOB_USD", 
+                      country = "US", return_raw = TRUE)
+```
+
+
+
+Then extract the data series (it is typically contained in `CompactData$DataSet$Series`):
+
+
+```r
+data_df <- data_list$CompactData$DataSet$Series
+
+names(data_df)
+```
+
+```
+## [1] "@FREQ"             "@REF_AREA"         "@INDICATOR"       
+## [4] "@COUNTERPART_AREA" "@UNIT_MULT"        "@TIME_FORMAT"     
+## [7] "Obs"
+```
+
+You can then subset and clean up `data_df` to suit your purposes.
+
+
