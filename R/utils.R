@@ -64,13 +64,13 @@ imf_data_one <- function(database_id, indicator, country, start,
 
             # Final clean up
             if (freq == 'A') {
-                names(sub_data) <- c('iso2c', 'year', indicator)
+                names(sub_data)[1:3] <- c('iso2c', 'year', indicator)
             }
             else if (freq == 'Q') {
-                names(sub_data) <- c('iso2c', 'year_quarter', indicator)
+                names(sub_data)[1:3] <- c('iso2c', 'year_quarter', indicator)
             }
             else if (freq == 'M') {
-                names(sub_data) <- c('iso2c', 'year_month', indicator)
+                names(sub_data)[1:3] <- c('iso2c', 'year_month', indicator)
             }
 
             sub_data[, 'iso2c'] <- sub_data[, 'iso2c'] %>% as.character
@@ -79,9 +79,9 @@ imf_data_one <- function(database_id, indicator, country, start,
             comb_dl <- rbind(comb_dl, sub_data)
 
             if (!isTRUE(last_element(u, 1:length(country)))) Sys.sleep(2)
-            }
-            if (nrow(comb_dl) >= 1) comb_dl <- comb_dl[order(comb_dl$iso2c), ]
         }
+            if (nrow(comb_dl) >= 1) comb_dl <- comb_dl[order(comb_dl$iso2c), ]
+    }
         return(comb_dl)
 }
 
