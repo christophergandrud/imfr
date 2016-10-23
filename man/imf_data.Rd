@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_functions.R
 \name{imf_data}
 \alias{imf_data}
-\title{Download an data from the IMF}
+\title{Download a data from the IMF}
 \usage{
 imf_data(database_id, indicator, country = "all", start = 2000,
   end = 2013, freq = "A", return_raw = FALSE, print_url = FALSE,
@@ -43,7 +43,7 @@ data list is returned. This can include additional information about the
 series.
 }
 \description{
-Download an data from the IMF
+Download a data from the IMF
 }
 \examples{
 # Download Real Effective Exchange Rate (CPI base) for the UK and China

@@ -108,7 +108,7 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
     else return(raw_dl)
 }
 
-#' Download an data from the IMF
+#' Download a data from the IMF
 #'
 #' @param database_id character string database ID. Can be found using
 #' \code{\link{imf_ids}}.
@@ -175,8 +175,10 @@ imf_data <- function(database_id, indicator, country = 'all',
                                    start = start, end = end,
                                    freq = freq, return_raw = return_raw,
                                    print_url = print_url)
-        if (nrow(one_series) == 0) stop('No data found.', call. = FALSE)
-        rownames(one_series) <- NULL
+        if (is.data.frame(one_series)) {
+            if (nrow(one_series) == 0) stop('No data found.', call. = FALSE)
+            rownames(one_series) <- NULL
+        }
         return(one_series)
     }
     else if (length(indicator) > 1) {
