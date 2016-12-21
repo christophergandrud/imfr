@@ -182,7 +182,7 @@ all_iso2c <- function() {
 isnt.null <- function(x)!is.null(x)
 
 #' Return current year
-#' @noRd
+#' @export
 
 current_year <- function() {
     y <- substr(Sys.Date(), start = 1, stop = 4)
