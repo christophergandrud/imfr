@@ -123,8 +123,8 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 #' @param end year for which you would like to end gathering the data.
 #' @param freq character string indicating the series frequency. With
 #' \code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.
-#' @param return_raw logical. Whether to return the data list
-#' a data frame with just the requested data series.
+#' @param return_raw logical. Whether to return the data
+#' as an unprocessed list.
 #' @param print_url logical. Whether to print the URL used in the API call.
 #' Can be useful for debugging.
 #' @param times numeric. Maximum number of requests to attempt.
@@ -152,7 +152,7 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 #' @export
 
 imf_data <- function(database_id, indicator, country = 'all',
-                     start = 2000, end = 2013,
+                     start = 2000, end = current_year(),
                      freq = 'A', return_raw = FALSE, print_url = FALSE,
                      times = 3)
 {

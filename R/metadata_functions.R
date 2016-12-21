@@ -66,7 +66,7 @@ imf_metastructure <- function(database_id, return_raw = FALSE) {
 #country = c('GB', 'CN')
 
 imf_metadata <- function(database_id, indicator, country = 'all',
-                     start = 2000, end = 2013, return_raw = FALSE)
+                     start = 2000, end = current_year(), return_raw = FALSE)
 {
     if (length(indicator) > 1)
         stop('imf_metadata only work with one indicator at a time',

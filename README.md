@@ -40,7 +40,7 @@ library(imfr)
 
 real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
                     country = c('CN', 'GB'), freq = 'A',
-                    start = 2013, end = 2013)
+                    start = 2013, end = current_year())
 ```
 
 

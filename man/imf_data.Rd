@@ -5,8 +5,8 @@
 \title{Download a data from the IMF}
 \usage{
 imf_data(database_id, indicator, country = "all", start = 2000,
-  end = 2013, freq = "A", return_raw = FALSE, print_url = FALSE,
-  times = 3)
+  end = current_year(), freq = "A", return_raw = FALSE,
+  print_url = FALSE, times = 3)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
@@ -28,8 +28,8 @@ all available countries.}
 \item{freq}{character string indicating the series frequency. With
 \code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.}
 
-\item{return_raw}{logical. Whether to return the data list
-a data frame with just the requested data series.}
+\item{return_raw}{logical. Whether to return the data
+as an unprocessed list.}
 
 \item{print_url}{logical. Whether to print the URL used in the API call.
 Can be useful for debugging.}
