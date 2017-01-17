@@ -8,6 +8,8 @@ imfr
 
 R package for interacting with the [International Monetary Funds's](http://data.imf.org/) [RESTful JSON API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service).
 
+
+
 # How to download IMF data
 
 You can use the `imf_data` function to download the data the IMF makes available via its API. To do this you will need at least the following information:
