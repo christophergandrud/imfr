@@ -1,7 +1,7 @@
 imfr
 ====================================
 
-[![CRAN Version](http://www.r-pkg.org/badges/version/imfr)](http://cran.r-project.org/package=imfr)
+[![CRAN Version](http://www.r-pkg.org/badges/version/imfr)](https://cran.r-project.org/package=imfr)
 [![Build Status](https://travis-ci.org/christophergandrud/imfr.svg?branch=master)](https://travis-ci.org/christophergandrud/imfr)
 ![CRAN Monthly Downloads](http://cranlogs.r-pkg.org/badges/last-month/imfr)
 ![CRAN Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/imfr)

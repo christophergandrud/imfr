@@ -1,5 +1,10 @@
 # All updates will be detailed here
 
+## Version 0.1.3
+
+- Bug fix for IMF API call using default user agent to `GET`. Thanks to
+@cjyetman for fixing.
+
 ## Version 0.1.2
 
 - Fixed a bug preventing `imf_data` from successfully completing
