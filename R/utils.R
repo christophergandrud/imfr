@@ -94,7 +94,7 @@ imf_data_one <- function(database_id, indicator, country, start,
 #' @noRd
 
 download_parse <- function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, progress(), times = times) %>%
+    raw_download <- RETRY('GET', URL, user_agent(''), progress(), times = times) %>%
         content(type = 'text', encoding = 'UTF-8')
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {
