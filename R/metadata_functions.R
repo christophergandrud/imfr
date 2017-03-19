@@ -56,14 +56,13 @@ imf_metastructure <- function(database_id, return_raw = FALSE) {
 #' @param return_raw logical. Whether to return the raw metadata
 #' a data frame with just the requested data metadata.
 #'
+#' @examples
+#' \dontrun{
+#' imf_metadata(database_id = 'IFS', indicator = 'EREER_IX',
+#'              start = 2012, end = 2013, country = c('GB', 'CN'))
+#' }
 #'
 #' @export
-
-#database_id = 'IFS'
-#indicator = 'EREER_IX'
-#start = 2012
-#end = 2012
-#country = c('GB', 'CN')
 
 imf_metadata <- function(database_id, indicator, country = 'all',
                      start = 2000, end = current_year(), return_raw = FALSE)

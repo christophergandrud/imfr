@@ -30,4 +30,3 @@ imf_metastructure(database_id = 'BOP')
 \seealso{
 \code{\link{imf_ids}}
 }
-

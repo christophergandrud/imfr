@@ -9,4 +9,3 @@ current_year()
 \description{
 Return current year
 }
-

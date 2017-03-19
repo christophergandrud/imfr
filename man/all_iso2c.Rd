@@ -17,4 +17,3 @@ Data frame of 253 ISO two letter country codes
 Used interally when users request to download data for 'all' countries.
 }
 \keyword{datasets}
-
