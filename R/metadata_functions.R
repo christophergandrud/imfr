@@ -59,7 +59,7 @@ imf_metastructure <- function(database_id, return_raw = FALSE) {
 #' @examples
 #' \dontrun{
 #' imf_metadata(database_id = 'IFS', indicator = 'EREER_IX',
-#'              start = 2012, end = 2013, country = c('GB', 'CN'))
+#'              start = 2001, end = 2001, country = 'CN')
 #' }
 #'
 #' @export
@@ -82,7 +82,7 @@ imf_metadata <- function(database_id, indicator, country = 'all',
     for (u in 1:length(country)) {
         country_sub <- country[u] %>% unlist
         country_sub <- paste(country_sub, sep = '', collapse = '+')
-        URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%s/%s.%s?startPeriod=%s&endPeriod=%s',
+        URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%s/.%s.%s?startPeriod=%s&endPeriod=%s',
             database_id, country, indicator, start, end)
         raw_dl <- download_parse(URL)
 

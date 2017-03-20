@@ -2,6 +2,8 @@
 
 ## Version 0.1.4
 
+- Resolved bug where `imf_metadata` produced malformed API calls. #9
+
 - Documentation improvements.
 
 ## Version 0.1.3

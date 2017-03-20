@@ -4,7 +4,7 @@ Title: Download Data from the International Monetary Fund's Data API
 Version: 0.1.4
 Description: Explore and download data from the International Monetary Fund's
     data API <http://data.imf.org/>.
-Date: 2016-03-19
+Date: 2016-03-20
 Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
     role = c("aut", "cre"))
