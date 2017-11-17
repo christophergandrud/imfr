@@ -9,11 +9,14 @@
 #' dataflow list is returned.
 #'
 #' @examples
+#' \dontrun{
 #' imf_ids()
+#' }
 #'
 #' @export
 
 imf_ids <- function(return_raw = FALSE, times = 3) {
+    warning('As of 2017-11-17 this request was not successful.')
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow/'
     raw_dl <- download_parse(URL)
 

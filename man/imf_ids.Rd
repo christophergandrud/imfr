@@ -21,6 +21,8 @@ dataflow list is returned.
 List imf database IDs
 }
 \examples{
+\dontrun{
 imf_ids()
+}
 
 }
