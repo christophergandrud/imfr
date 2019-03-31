@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_functions.R
 \name{imf_ids}
 \alias{imf_ids}
-\title{List imf database IDs}
+\title{List IMF database IDs}
 \usage{
 imf_ids(return_raw = FALSE, times = 3)
 }
@@ -18,11 +18,9 @@ and descriptions is returned. If \code{return_raw = TRUE} then the raw
 dataflow list is returned.
 }
 \description{
-List imf database IDs
+List IMF database IDs
 }
 \examples{
-\dontrun{
 imf_ids()
-}
 
 }

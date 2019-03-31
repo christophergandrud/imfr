@@ -1,4 +1,4 @@
-#' List imf database IDs
+#' List IMF database IDs
 #'
 #' @param return_raw logical. Whether to return the raw dataflow list or a
 #' data frame with database IDs and names.
@@ -9,21 +9,17 @@
 #' dataflow list is returned.
 #'
 #' @examples
-#' \dontrun{
 #' imf_ids()
-#' }
 #'
 #' @export
 
 imf_ids <- function(return_raw = FALSE, times = 3) {
-    warning('As of 2017-11-17 this request was not successful.')
-    URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow/'
+    URL <- 'https://sdmxcentral.imf.org/ws/public/sdmxapi/rest/Dataflow?format=sdmx-json'
     raw_dl <- download_parse(URL)
 
     if (!isTRUE(return_raw)) {
-        data_id <- raw_dl$Structure$KeyFamilies$KeyFamily$`@id`
-        long_name = raw_dl$Structure$KeyFamilies$KeyFamily$Name$`#text`
-
+        data_id <- raw_dl$Dataflow$id
+        long_name <- unlist(sapply(raw_dl$Dataflow$names, `[`, "value"))
         id_name <- data.frame(database_id = data_id, description = long_name)
         return(id_name)
     }

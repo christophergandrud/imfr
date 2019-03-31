@@ -1,5 +1,9 @@
 # All updates will be detailed here
 
+## Version 0.1.6
+
+- Reinstated `imf_ids` functionality. Thank you @cjyetman. #11
+
 ## Version 0.1.5
 
 - Warning on `imf_ids` that as of 2017-11-17 the request is unsuccessful.
