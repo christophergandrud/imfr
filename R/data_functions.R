@@ -14,12 +14,17 @@
 #' @export
 
 imf_ids <- function(return_raw = FALSE, times = 3) {
-    URL <- 'https://sdmxcentral.imf.org/ws/public/sdmxapi/rest/Dataflow?format=sdmx-json'
-    raw_dl <- download_parse(URL)
+    URL <- "http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow"
+    raw_dl <- RETRY('GET', URL, user_agent(''), progress(), times = times) %>%
+        content()
 
     if (!isTRUE(return_raw)) {
-        data_id <- raw_dl$Dataflow$id
-        long_name <- unlist(sapply(raw_dl$Dataflow$names, `[`, "value"))
+        data_id <- purrr::map_chr(raw_dl$Structure$Dataflows$Dataflow,
+                                  ~ .x %>% `[[`("@id") %>% stringr::str_sub(start = 4L))
+
+        long_name <- purrr::map_chr(raw_dl$Structure$Dataflows$Dataflow,
+                                    ~ .x %>% `[[`("Name") %>% `[[`("#text"))
+
         id_name <- data.frame(database_id = data_id, description = long_name)
         return(id_name)
     }
