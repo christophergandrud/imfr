@@ -20,7 +20,9 @@ imf_ids <- function(return_raw = FALSE, times = 3) {
 
     if (!isTRUE(return_raw)) {
         data_id <- purrr::map_chr(raw_dl$Structure$Dataflows$Dataflow,
-                                  ~ .x %>% `[[`("@id") %>% stringr::str_sub(start = 4L))
+                                  ~ .x %>% `[[`("@id") %>%
+                                      stringr::str_sub(start = 4L) %>%
+                                      stringr::str_replace("\n$", ""))
 
         long_name <- purrr::map_chr(raw_dl$Structure$Dataflows$Dataflow,
                                     ~ .x %>% `[[`("Name") %>% `[[`("#text"))
