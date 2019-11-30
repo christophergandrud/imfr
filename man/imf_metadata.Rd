@@ -4,8 +4,14 @@
 \alias{imf_metadata}
 \title{Access meta data for specific country-series}
 \usage{
-imf_metadata(database_id, indicator, country = "all", start = 2000,
-  end = current_year(), return_raw = FALSE)
+imf_metadata(
+  database_id,
+  indicator,
+  country = "all",
+  start = 2000,
+  end = current_year(),
+  return_raw = FALSE
+)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using

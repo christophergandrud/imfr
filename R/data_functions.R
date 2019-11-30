@@ -9,7 +9,7 @@
 #' dataflow list is returned.
 #'
 #' @examples
-#' imf_ids()
+#' head(imf_ids())
 #'
 #' @export
 
@@ -18,9 +18,7 @@ imf_ids <- function(return_raw = FALSE, times = 3) {
     raw_dl <- download_parse(URL)
 
     if (!isTRUE(return_raw)) {
-        data_id <- raw_dl$Structure$Dataflows$Dataflow$`@id` %>%
-            sub("^DS-", "", .) %>%
-            sub("\n$", "", .)
+        data_id <- raw_dl$Structure$Dataflows$Dataflow$KeyFamilyRef$KeyFamilyID
         long_name <- raw_dl$Structure$Dataflows$Dataflow$Name$`#text`
         id_name <- data.frame(database_id = data_id, description = long_name)
         return(id_name)

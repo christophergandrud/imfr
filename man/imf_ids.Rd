@@ -21,6 +21,6 @@ dataflow list is returned.
 List IMF database IDs
 }
 \examples{
-imf_ids()
+head(imf_ids())
 
 }

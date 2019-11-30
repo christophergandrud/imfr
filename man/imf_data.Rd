@@ -4,9 +4,17 @@
 \alias{imf_data}
 \title{Download a data from the IMF}
 \usage{
-imf_data(database_id, indicator, country = "all", start = 2000,
-  end = current_year(), freq = "A", return_raw = FALSE,
-  print_url = FALSE, times = 3)
+imf_data(
+  database_id,
+  indicator,
+  country = "all",
+  start = 2000,
+  end = current_year(),
+  freq = "A",
+  return_raw = FALSE,
+  print_url = FALSE,
+  times = 3
+)
 }
 \arguments{
 \item{database_id}{character string database ID. Can be found using
