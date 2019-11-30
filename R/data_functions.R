@@ -155,6 +155,8 @@ imf_data <- function(database_id, indicator, country = 'all',
                      freq = 'A', return_raw = FALSE, print_url = FALSE,
                      times = 3)
 {
+    if (!isTRUE(inherits(indicator, "character")))
+        stop("indicator must be a character string or vector.")
     if (length(indicator) > 1 & isTRUE(return_raw))
         stop('return_raw only works with one indicator at a time',
              call. = FALSE)

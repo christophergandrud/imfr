@@ -4,6 +4,9 @@
 
 - Re-reinstated `imf_ids` functionality. Thank you to @mitsuoxv. #17
 
+- `imf_data` throws a more intelligible error when `indicator` does not
+inherit `character`. #16
+
 ## Version 0.1.6
 
 - Reinstated `imf_ids` functionality. Thank you @cjyetman. #11
