@@ -4,6 +4,9 @@
 
 - Updated `imf_ids` to point to new URL.
 
+- Introduced "NA" ISO2C code for Namibia. Thank you to #msgoussi for reporting.
+#22, #23
+
 ## Version 0.1.7
 
 - Re-reinstated `imf_ids` functionality. Thank you to @mitsuoxv. #17
