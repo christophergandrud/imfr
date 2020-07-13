@@ -1,5 +1,9 @@
 # All updates will be detailed here
 
+## Version 0.1.8
+
+- Updated `imf_ids` to point to new URL.
+
 ## Version 0.1.7
 
 - Re-reinstated `imf_ids` functionality. Thank you to @mitsuoxv. #17
