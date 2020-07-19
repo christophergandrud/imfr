@@ -2,7 +2,8 @@
 
 ## Version 0.1.8
 
-- Updated `imf_ids` to point to new URL.
+- Updated `imf_ids` to point to new URL following deprecation of old
+SDMX service. See <http://sdmxws.imf.org/Default.htm>.
 
 - Introduced "NA" ISO2C code for Namibia. Thank you to #msgoussi for reporting.
 #22, #23
