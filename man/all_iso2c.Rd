@@ -3,9 +3,11 @@
 \docType{data}
 \name{all_iso2c}
 \alias{all_iso2c}
-\title{Data frame of 253 ISO two letter country codes
-Used interally when users request to download data for 'all' countries.}
-\format{a data frame with 253 observations and 1 column}
+\title{Data frame of 254 ISO two letter country codes
+Used internally when users request to download data for 'all' countries.}
+\format{
+a data frame with 254 observations and 1 column
+}
 \source{
 From the countrycode package.
 }
@@ -13,7 +15,7 @@ From the countrycode package.
 all_iso2c
 }
 \description{
-Data frame of 253 ISO two letter country codes
-Used interally when users request to download data for 'all' countries.
+Data frame of 254 ISO two letter country codes
+Used internally when users request to download data for 'all' countries.
 }
 \keyword{datasets}
