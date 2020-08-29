@@ -1,5 +1,11 @@
 # All updates will be detailed here
 
+## Version 0.1.9
+
+- Resolves bug where `imf_data` would stop for iterations with small
+numbers of countries with no data, stopping the entire download.
+Thank you to @mitsuoxv for the contribution.
+
 ## Version 0.1.8
 
 - Updated `imf_ids` to point to new URL following deprecation of old
