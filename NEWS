@@ -1,5 +1,10 @@
 # All updates will be detailed here
 
+## Version 0.1.9.1
+
+- Resolves bug where data for one country with one frequency would not
+parse. #27
+
 ## Version 0.1.9
 
 - Resolves bug where `imf_data` would stop for iterations with small

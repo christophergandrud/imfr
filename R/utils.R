@@ -55,14 +55,26 @@ imf_data_one <- function(database_id, indicator, country, start,
             series_pos <- series_pos[series_pos %in% not_null]
 
             countries <- overview$`@REF_AREA`[series_pos]
-            sub_data <- observations[series_pos]
-            suppressWarnings(
-                sub_data <- sub_data %>%
-                    lapply(as.data.frame, stringsAsFactors = FALSE) %>%
-                    Map(cbind, ., iso2c = countries) %>%
-                    do.call(bind_rows, .) %>%
-                    MoveFront('iso2c')
-            )
+            if (inherits(observations, what = "list")) {
+                sub_data <- observations[series_pos]
+                suppressWarnings(
+                    sub_data <- sub_data %>%
+                        lapply(as.data.frame, stringsAsFactors = FALSE) %>%
+                        Map(cbind, ., iso2c = countries) %>%
+                        do.call(bind_rows, .) %>%
+                        MoveFront('iso2c')
+                )
+            }
+            else if (inherits(observations, what = "data.frame")) {
+                sub_data <- observations
+                if (length(countries) == 1) {
+                    sub_data$iso2c <- countries
+                    sub_data <- MoveFront(sub_data, 'iso2c')
+                }
+                else {
+                    stop("Encountered unexpected data", call. = FALSE)
+                }
+            }
 
             sub_data <- sub_data[, 1:3]
 

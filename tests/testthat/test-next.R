@@ -7,3 +7,9 @@ expect_error(
     ),
     NA
 )
+
+expect_equal(
+    ncol(imf_data(database_id = "WHDREO", indicator = "PCPI_PCH",
+                       freq = "A", country = c("MX"))),
+    3
+)
