@@ -30,6 +30,20 @@ You can use the `imf_data` function to download the data the IMF makes available
 
 - `freq`: the frequency of the series you want to download. Often series are available annually, quarterly, and monthly.
 
+## Data Limitations
+
+Although listed in the IMF database list (accessible with the `imf_databases` function), the following databases apparently are not actually accessible through the API. As of last testing, attempts to access these databases will return an error.
+
+  series_name                                                        series_key  
+  <chr>                                                              <chr>       
+1 Financial Access Survey (FAS), 2015                                FAS_2015    
+2 Government Finance Statistics (GFS 2001)                           GFS01       
+3 Fiscal Monitor (FM) October 2020                                   FM202010    
+4 Asia and Pacific Regional Economic Outlook (APDREO) October 2020   APDREO202010
+5 Sub-Saharan Africa Regional Economic Outlook (AFRREO) October 2020 AFRREO202010
+6 Western Hemisphere Regional Economic Outlook (WHDREO) October 2020 WHDREO202010
+7 Balance of Payments (BOP), World and Regional Aggregates, 2020     BOPAGG_2020 
+
 ## Examples
 
 ### Simple Country-Time-Variable

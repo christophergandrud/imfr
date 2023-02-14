@@ -2,67 +2,80 @@
 % Please edit documentation in R/data_functions.R
 \name{imf_data}
 \alias{imf_data}
-\title{Download a data from the IMF}
+\title{Download a data series from the IMF}
 \usage{
-imf_data(
-  database_id,
-  indicator,
-  country = "all",
-  start = 2000,
-  end = current_year(),
-  freq = "A",
-  return_raw = FALSE,
-  print_url = FALSE,
-  times = 3
-)
+imf_data(database_id, parameters, start_year, end_year ...)
 }
 \arguments{
-\item{database_id}{character string database ID. Can be found using
-\code{\link{imf_ids}}.}
+\item{database_id}{character string. Database ID for database from which
+you would like to request data. Can be found using
+\code{\link{imf_databases}}.}
 
-\item{indicator}{character string or character vector of indicator IDs.
-These can be found using \code{\link{imf_codes}}.}
+\item{parameters}{list of data frames providing input parameters for your
+API request. Retrieve list of all possible input parameters using
+\code{\link{imf_parameters}} and filter each data frame in the list to
+reduce it to the inputs you want.}
 
-\item{country}{character string or character vector of ISO two letter
-country codes identifying the countries for which you would like to
-download the data.See \url{https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2}.
-If \code{country = 'all'} then \code{imf_data} will attempt to download
-all available countries.}
+\item{start_year}{integer four-digit year. Earliest year for which you would like
+to request data.}
 
-\item{start}{year for which you would like to start gathering the data.}
-
-\item{end}{year for which you would like to end gathering the data.}
-
-\item{freq}{character string indicating the series frequency. With
-\code{'A'} for annual, \code{'Q'} for quarterly, and \code{'M'} for monthly.}
-
-\item{return_raw}{logical. Whether to return the data
-as an unprocessed list.}
+\item{end_year}{integer four-digit year. Latest year for which you would like to
+request data.}
 
 \item{print_url}{logical. Whether to print the URL used in the API call.
 Can be useful for debugging.}
 
 \item{times}{numeric. Maximum number of requests to attempt.}
+
+\item{accounting_entry, activity, adjustment, age, classification, cofog_function, commodity, comp_method, composite_breakdown, counterpart_area, counterpart_sector, currency_denom, cust_breakdown, disability_status, education_lev, expenditure, financial_institution, flow_stock_entry, freq, functional_cat, gfs_sto, income_wealth_quantile, indicator, instr_asset, instrument_and_assets_classification, int_acc_item, maturity, occupation, prices, product, ref_area, ref_sector, reporting_type, series, sex, sto, summary_statistics, survey, transformation, type, unit_measure, urbanisation, valuation}{character vector. Use \code{imf_parameters} to identify which parameters to
+use for requests from a given database and to see all valid input codes for
+each parameter.}
 }
 \value{
-If \code{return_raw = FALSE} then a data frame with just the
-requested data series are returned. If \code{return_raw = TRUE} then the raw
-data list is returned. This can include additional information about the
-series.
+Returns a tidy data frame with the data series.
 }
 \description{
-Download a data from the IMF
+Function to request data from a database through the IMF API endpoint.
+}
+\details{
+Only the \code{database_id} argument is strictly required; all other
+arguments are optional. If you provide a \code{database_id} without any other
+arguments, the function will attempt to download the entire database.
+However, many databases available through the API are too large to download
+in their entirety, and your request will fail. Additional arguments to the
+function act as filter parameters to reduce the size of the returned dataset.
+For instance, supplying \code{c("A","M")} as the \code{freq} argument will
+return all database observations of annual or monthly frequency, while
+excluding all observations of quarterly frequency.
+
+There are two ways to supply parameters for your API request. The optimal way
+is to retrieve a list of data frames using \code{\link{imf_parameters}},
+filter each data frame to retain only the parameters you want, and then
+supply the modified list object to \code{imf_data} as its \code{parameters}
+argument. However, users who are not comfortable modifying data frames in a
+nested list may find it easier to instead supply one or more character
+vectors as arguments, as in the example in the previous paragraph. (There are
+a total of 44 possible parameters for making request from various databases
+through the API, and each parameter uses unique input codes, which is why the
+\code{parameters} list method simplifies things!) These two methods for
+specifying parameters may not be combined. Only  \code{database_id},
+\code{start_year}, \code{end_year}, \code{print_url}, and \code{times}
+arguments may be used in combination with a \code{parameters} list object;
+any other arguments will be ignored (and a warning thrown).
 }
 \examples{
-# Download Real Effective Exchange Rate (CPI base) for the UK and China
-# at an annual frequency
-real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-               country = c('CN', 'GB'), freq = 'A')
+# Retrieve "Assets (with Fund Record), National Currency" series from the
+# Balance of Payments database using the list object method
+params <- imf_parameters(database_id = 'BOP')
+params$indicator <- filter(params$indicator,
+                           description == 'Assets (with Fund Record), National Currency')
+df <- imf_data(database_id = 'BOP', parameters = params)
 
-\dontrun{
-# Also download Interest Rates, Lending Rate, Percent per annum
-ex_interest <- imf_data(database_id = 'IFS',
-                         indicator = c('FILR_PA', 'EREER_IX'),
-                         freq = 'M')
-}
+# Retrieve "Assets (with Fund Record), National Currency" series from the
+# Balance of Payments database using the character vector method
+params <- imf_parameters(database_id = 'BOP')
+indicator_code <- filter(params$indicator,
+                           description == 'Assets (with Fund Record), National Currency')$input_code
+df <- imf_data(database_id = 'BOP', indicator = indicator_code)
+
 }
