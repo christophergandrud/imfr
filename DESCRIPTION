@@ -18,6 +18,7 @@ Imports:
     dplyr,
     httr (>= 1.2.0),
     jsonlite
+    purrr
 LazyData: TRUE
 RoxygenNote: 7.2.3
 Suggests: 

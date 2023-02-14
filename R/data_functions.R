@@ -197,7 +197,7 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #' df <- imf_data(database_id = 'BOP', indicator = indicator_code)
 #'
 #' @importFrom dplyr %>% filter bind_cols
-#' @importFrom purrr map
+#' @importFrom purrr map walk
 #'
 #' @export
 
