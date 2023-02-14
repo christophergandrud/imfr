@@ -64,7 +64,7 @@ imf_databases <- function(times = 3) {
 #' params$freq
 #'
 #' @importFrom dplyr %>%
-#' @importFrom purrr map
+#' @importFrom purrr map map_dfr
 #'
 #' @export
 
