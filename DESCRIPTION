@@ -17,7 +17,7 @@ License: GPL (>= 3)
 Imports:
     dplyr,
     httr (>= 1.2.0),
-    jsonlite
+    jsonlite,
     purrr
 LazyData: TRUE
 RoxygenNote: 7.2.3
