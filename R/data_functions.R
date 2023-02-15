@@ -133,7 +133,7 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #' @description Function to request data from a database through the IMF API endpoint.
 #'
 #' @usage
-#' imf_data(database_id, parameters, start_year, end_year ...)
+#' imf_data(database_id, parameters, start_year, end_year)
 #'
 #' @details Only the \code{database_id} argument is strictly required; all other
 #' arguments are optional. If you provide a \code{database_id} without any other

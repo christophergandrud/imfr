@@ -4,7 +4,7 @@
 \alias{imf_data}
 \title{Download a data series from the IMF}
 \usage{
-imf_data(database_id, parameters, start_year, end_year ...)
+imf_data(database_id, parameters, start_year, end_year)
 }
 \arguments{
 \item{database_id}{character string. Database ID for database from which
