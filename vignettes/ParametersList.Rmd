@@ -1,8 +1,8 @@
 ---
-title: "Parameters List"
+title: "ParametersList"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Parameters List}
+  %\VignetteIndexEntry{ParametersList}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

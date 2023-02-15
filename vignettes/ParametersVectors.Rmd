@@ -1,8 +1,8 @@
 ---
-title: "Parameters Vectors"
+title: "ParametersVectors"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Parameters Vectors}
+  %\VignetteIndexEntry{ParametersVectors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
