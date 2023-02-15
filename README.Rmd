@@ -104,7 +104,7 @@ kable(params$freq)
 
 There are two ways to supply parameters to `imf_data`: by supplying vector arguments or by supplying a modified parameters list.
 
-To supply vector arguments, just find the codes you want and supply them to `imf_data` using the parameter name as the argument name. The example below shows how to request annual coal price data from the Primary Commodity Price System database:
+To supply vector arguments, just find the codes you want and supply them to `imf_data` using the parameter name as the argument name. The example below shows how to request 2000–2015 annual coal prices from the Primary Commodity Price System database:
 
 ```{r annual_coal_vectors}
 # Fetch the 'freq' input code for annual frequency
@@ -113,9 +113,14 @@ selected_freq <- params$freq$input_code[str_detect(tolower(params$freq$descripti
 # Fetch the 'commodity' input code for coal
 selected_commodity <- params$commodity$input_code[str_detect(tolower(params$commodity$description),"coal index")]
 
+# Fetch the 'unit_measure' input code for index
+selected_unit_measure <- params$unit_measure$input_code[str_detect(tolower(params$unit_measure$description),"index")]
+
 # Request data from the API
 df <- imf_data(database_id = commodity_db$database_id,
-         freq = selected_freq, commodity = selected_commodity)
+         freq = selected_freq, commodity = selected_commodity,
+         unit_measure = selected_unit_measure,
+         start_year = 2000, end_year = 2015)
 
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
@@ -130,11 +135,16 @@ params$freq <- params$freq %>%
 
 # Filter the commodity data frame for the coal index
 params$commodity <- params$commodity %>%
-    filter(str_detect(tolower(.$description),"coal"))
+    filter(str_detect(tolower(.$description),"coal index"))
+
+# Filter the unit_measure data frame for index
+params$unit_measure <- params$unit_measure %>%
+    filter(str_detect(tolower(.$description),"index"))
 
 # Request data from the API
 df <- imf_data(database_id = commodity_db$database_id,
-               parameters = params)
+               parameters = params,
+         start_year = 2000, end_year = 2015)
 
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
