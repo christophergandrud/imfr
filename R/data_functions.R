@@ -111,7 +111,7 @@ imf_parameters <- function(database_id, times = 3) {
 #' Balance of Payments database
 #' imf_parameter_defs(database_id = 'BOP'))
 #'
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% select
 #' @importFrom purrr map
 #'
 #' @export
@@ -196,7 +196,7 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #'                            description == 'Assets (with Fund Record), National Currency')$input_code
 #' df <- imf_data(database_id = 'BOP', indicator = indicator_code)
 #'
-#' @importFrom dplyr %>% filter bind_cols
+#' @importFrom dplyr %>% filter bind_cols select
 #' @importFrom purrr map walk
 #'
 #' @export
