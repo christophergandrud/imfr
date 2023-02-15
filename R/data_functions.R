@@ -283,8 +283,8 @@ Character vector parameters arguments will be ignored.",immediate.=T)
     }
     if(!missing(parameters)){
         if(class(parameters) != "list" | any(is.null(names(parameters))) |
-           class(imf_parameters('PCPS')[[1]]) != "data.frame" |
-           !all(names(imf_parameters('PCPS')[[1]]) == c("input_code","description"))){
+           class(parameters[[1]]) != "data.frame" |
+           !all(names(parameters[[1]]) == c("input_code","description"))){
             stop("parameters argument must be a named list of data frames, each with columns \'input_code\' and \'description\'.",
                  call. = FALSE)
         }
@@ -307,6 +307,9 @@ Character vector parameters arguments will be ignored.",immediate.=T)
 Use imf_parameters(\'",database_id,"\')$",name_vector[x],"to see all valid input codes for this parameter.
 Note that codes are case sensitive.",immediate.=T))
                 }
+                df <- if(nrow(df) == nrow(data_dimensions[[x]])){
+                    data.frame(input_code = c(),description = c())
+                }else{df}
                 return(df)
             }else{
                 return(data.frame(input_code = c(),description = c()))
@@ -329,6 +332,9 @@ Use imf_parameters(\'",database_id,"\') to get valid parameters."),
 Use imf_parameters(\'",database_id,"\')$",name_vector[x]," to see all valid input codes for this parameter.
 Note that codes are case sensitive.",immediate.=T))
                 }
+                df <- if(nrow(df) == nrow(data_dimensions[[x]])){
+                    data.frame(input_code = c(),description = c())
+                }else{df}
                 return(df)
             }else{
                 return(data.frame(input_code = c(),description = c()))
@@ -358,19 +364,33 @@ imf_data will attempt to request the entire database.",immediate.=T)
     if(print_url){print(url)}
 
     raw_dl <- download_parse(url)$CompactData$DataSet$Series
-    df <- map_dfr(1:length(raw_dl$Obs),function(n){
-        df <- raw_dl$Obs[[n]] %>%
+    if(!is.data.frame(raw_dl$Obs)){
+        df <- map_dfr(1:length(raw_dl$Obs),function(n){
+            df <- raw_dl$Obs[[n]] %>%
+                select(date = `@TIME_PERIOD`,
+                       value = `@OBS_VALUE`)
+            tmp <- as.data.frame(
+                map(.x = name_vector,.f = function(variable_name){
+                    vec <- rep(raw_dl[[paste0("@",toupper(variable_name))]][n],times=nrow(df))
+                    return(vec)
+                })
+            )
+            names(tmp) <- name_vector
+            df <- bind_cols(df,tmp)
+            return(df)
+        })
+    }else{
+        df <- raw_dl$Obs %>%
             select(date = `@TIME_PERIOD`,
                    value = `@OBS_VALUE`)
         tmp <- as.data.frame(
             map(.x = name_vector,.f = function(variable_name){
-                vec <- rep(raw_dl[[paste0("@",toupper(variable_name))]][n],times=nrow(df))
+                vec <- rep(raw_dl[[paste0("@",toupper(variable_name))]],times=nrow(df))
                 return(vec)
-                })
+            })
         )
         names(tmp) <- name_vector
         df <- bind_cols(df,tmp)
-        return(df)
-    })
+    }
     return(df)
 }
