@@ -85,7 +85,7 @@ FM202010, APDREO202010, AFRREO202010, WHDREO202010, BOPAGG_2020.)
 
 To view and explore the database list, it’s possible to open a viewing
 pane with `View(databases)` or to create an attractive table with
-`kintr::kable(databases)`. Or, if you already know which database you
+`knitr::kable(databases)`. Or, if you already know which database you
 want, you can fetch the corresponding code by searching the description
 column for the database name with `stringr::str_detect`. For instance,
 here’s how to search for the Primary Commodity Price System:
