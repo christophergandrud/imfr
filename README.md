@@ -10,21 +10,42 @@ Originally created by Christopher Gandrud, imfr is an R package for
 downloading data from the International Monetary Fund API endpoint.
 Version 2.0.0, by Christopher C. Smith, is an extensive revision of the
 package to make it both more powerful and more user-friendly.
-Regrettably, Version 2.0.0 is *not* backward-compatible; you will need
-to update old scripts if you update the package. The changes to the
-functionality of the package in this version were extensive, and
-adoption of the previous version was judged limited enough to make
-backward compatibility unnecessary.
+Regrettably, Version 2.0.0 is *not* currently backward-compatible.
+Backward compatibility is planned for an update.
+
+## Why Version 2?
+
+The previous version of imfr allowed for specifying only three
+parameters—the same three for every database. This approach was
+sufficient to query some databases, but not others. As a result, the
+functionality of the package was limited, and many API requests failed.
+
+The previous version also served users a third-party list of ISO2
+country codes for use in requests rather than a database’s own internal
+list of valid input codes. This, too, resulted in the failure of many an
+API request.
+
+In addition to correcting these failures of basic functionality, Version
+2.0.0 also extends the functionality of the package to allow for faster,
+more versatile, and more specific requests. Users may now use a much
+larger set of filter parameters in making requests. Additionally,
+Version 2.0.0 tries to address the problem of user-friendliness by
+introducing more package documentation with suggested workflows and
+example vignettes.
+
+For now, Version 2.0.0 is available only as a fork of the main package.
 
 ## Installation
 
 To install the development version of imfr, use:
 
 ``` r
-devtools::install_github("chriscarrollsmith/imfr", build_vignettes = TRUE)
+devtools::install_github("chriscarrollsmith/imfr", build_vignettes = TRUE)'
 ```
 
 ## Usage
+
+### Suggested packages
 
 I recommend using imfr in combination with the tidyverse, stringr, and
 knitr libraries, which introduces a powerful set of functions for
@@ -37,17 +58,11 @@ packages using the `library` function:
 # Load libraries
 library(imfr)
 library(tidyverse)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-#> ✔ ggplot2 3.4.0     ✔ purrr   1.0.1
-#> ✔ tibble  3.1.8     ✔ dplyr   1.1.0
-#> ✔ tidyr   1.3.0     ✔ stringr 1.5.0
-#> ✔ readr   2.1.3     ✔ forcats 1.0.0
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
 library(stringr)
 library(knitr)
 ```
+
+### Fetching an Index of Databases with the imf_databases Function
 
 The imfr package introduces four core functions: `imf_databases`,
 `imf_parameters`, `imf_parameter_defs`, and `imf_data`. The function for
@@ -64,10 +79,9 @@ databases <- imf_databases()
 ```
 
 This function returns the IMF’s listing of 259 databases available
-through the API. (In reality, 11 of the listed databases are defunct and
-not actually available: FAS_2015, GFS01, APDREO201610, BOP_2019M2,
-BOP_2018M02, DOT_2020Q3, FM202010, APDREO202010, AFRREO202010,
-WHDREO202010, BOPAGG_2020.)
+through the API. (In reality, 9 of the listed databases are defunct and
+not actually available: FAS_2015, GFS01, IFS_2020M02, IFS_2020M11,
+FM202010, APDREO202010, AFRREO202010, WHDREO202010, BOPAGG_2020.)
 
 To view and explore the database list, it’s possible to open a viewing
 pane with `View(databases)` or to create an attractive table with
@@ -88,6 +102,8 @@ kable(commodity_db)
 |:----|:------------|:--------------------------------------|
 | 245 | PCPS        | Primary Commodity Price System (PCPS) |
 
+### Fetching a List of Parameters and Input Codes with imf_parameters and imf_parameter_defs
+
 Once you have a database_id, it’s possible to make a call to `imf_data`
 to fetch the entire database: `imf_data(commodity_db$database_id)`.
 However, while this will succeed for some small databases, it will fail
@@ -97,8 +113,11 @@ additional filter parameters to reduce the size of your request.
 
 Requests to databases available through the IMF API are complicated by
 the fact that each database uses a different set of parameters when
-making a request, and you also have to have the list of valid input
-codes for each parameter. You can obtain these using `imf_parameters`:
+making a request. There are, in fact, 2 unique parameters used in
+different database requests! You also have to have the list of valid
+input codes for each parameter. The `imf_parameters` function solves
+this problem. Use the function to obtain the full list of parameters and
+valid input codes for a given database:
 
 ``` r
 # Fetch list of valid parameters and input codes for commodity price database
@@ -153,6 +172,8 @@ kable(params$freq)
 | M          | Monthly     |
 | Q          | Quarterly   |
 
+### Supplying Parameter Arguments to imf_data: A Tale of Two Workflows
+
 There are two ways to supply parameters to `imf_data`: by supplying
 vector arguments or by supplying a modified parameters list.
 
@@ -177,9 +198,9 @@ df <- imf_data(database_id = commodity_db$database_id,
          unit_measure = selected_unit_measure,
          start_year = 2000, end_year = 2015)
 #> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-#> Request failed [ERROR]. Retrying in 1.6 seconds...
+#> Request failed [ERROR]. Retrying in 1.3 seconds...
 #> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-#> Request failed [ERROR]. Retrying in 3 seconds...
+#> Request failed [ERROR]. Retrying in 3.4 seconds...
 
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
@@ -230,6 +251,8 @@ kable(head(df))
 | 2003 | 43.2878876950788 | A    | W00      | PCOAL     | IX           |
 | 2004 | 82.9185858052862 | A    | W00      | PCOAL     | IX           |
 | 2005 | 71.9223526096731 | A    | W00      | PCOAL     | IX           |
+
+### View the imfr Vignettes Demonstrating the Two Workflows
 
 See also the vignettes, which can be accessed with
 `vignette("ParametersList")` and `vignette("ParametersVectors")`.
