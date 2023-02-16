@@ -256,3 +256,13 @@ kable(head(df))
 
 See also the vignettes, which can be accessed with
 `vignette("ParametersList")` and `vignette("ParametersVectors")`.
+
+## Development Notes
+
+Planned features for future versions:
+
+* Add backward compatibility with Version 1 of imfr
+* Add a workaround to support for "All" codes that are listed as valid input codes in the IMF parameters lists but don't actually work when used in API requests
+* Determine maximum length of a request URL, and do multiple requests if the URL is too long
+* Add systematic feature testing
+* Hopefully merge Version 2 onto the main Github branch for the imfr package and submit to CRAN
