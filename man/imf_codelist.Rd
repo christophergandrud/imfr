@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_functions.R
 \name{imf_codelist}
 \alias{imf_codelist}
-\title{Retreive the list of codes (codelist) for of an individual IMF database.}
+\title{Retrieve the list of codes (codelist) for of an individual IMF database.}
 \usage{
 imf_codelist(database_id, return_raw = FALSE, times = 3)
 }
@@ -21,7 +21,7 @@ and descriptions is returned. If \code{return_raw = TRUE} then the raw
 data strcuture list is returned.
 }
 \description{
-Retreive the list of codes (codelist) for of an individual IMF database.
+Retrieve the list of codes (codelist) for of an individual IMF database.
 }
 \examples{
 \dontrun{

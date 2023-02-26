@@ -27,7 +27,7 @@ imf_ids <- function(return_raw = FALSE, times = 3) {
 }
 
 
-#' Retreive the list of codes (codelist) for of an individual IMF database.
+#' Retrieve the list of codes (codelist) for of an individual IMF database.
 #'
 #' @param database_id character string of a \code{database_id} from
 #' \code{\link{imf_ids}}.

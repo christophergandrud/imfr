@@ -1,5 +1,9 @@
 # All updates will be detailed here
 
+## Version 0.1.9.2
+
+- Use GitHub actions build pipeline
+
 ## Version 0.1.9.1
 
 - Resolves bug where data for one country with one frequency would not
