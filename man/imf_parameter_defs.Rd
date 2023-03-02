@@ -4,13 +4,16 @@
 \alias{imf_parameter_defs}
 \title{Get definitions of IMF API parameters}
 \usage{
-imf_parameter_defs(database_id, times = 3)
+imf_parameter_defs(database_id, times = 3, inputs_only = F)
 }
 \arguments{
 \item{database_id}{character string of a \code{database_id} from
 \code{\link{imf_databases}}.}
 
 \item{times}{numeric. Maximum number of API requests to attempt.}
+
+\item{inputs_only}{logical. Whether to return only parameters used as inputs
+in API requests, or also output variables.}
 }
 \value{
 Returns a data frame of input parameters used in making API requests

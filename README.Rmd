@@ -18,31 +18,29 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-Originally created by Christopher Gandrud, imfr is an R package for downloading data from the International Monetary Fund API endpoint. Version 2.0.0, by Christopher C. Smith, is an extensive revision of the package to make it both more powerful and more user-friendly. Regrettably, Version 2.0.0 is *not* currently backward-compatible. Backward compatibility is planned for an update.
+Originally created by Christopher Gandrud, imfr is an R package for downloading data from the International Monetary Fund API endpoint. Version 2, by Christopher C. Smith, is an extensive revision of the package to make it both more powerful and more user-friendly. Version 2 is backward-compatible with Version 1, but most of the functions from Version 1 are deprecated and will raise warnings if you try to use them.
 
 ## Why Version 2?
 
-The previous version of imfr allowed for specifying only three parameters—the same three for every database. This approach was sufficient to query some databases, but not others. As a result, the functionality of the package was limited, and many API requests failed.
+The previous version of `imfr` allowed for specifying only three parameters—the same three for every database. This approach was sufficient to query some databases, but not others. As a result, the functionality of the package was limited, and many API requests failed.
 
 The previous version also served users a third-party list of ISO2 country codes for use in requests rather than a database's own internal list of valid input codes. This, too, resulted in the failure of many an API request.
 
-In addition to correcting these failures of basic functionality, Version 2.0.0 also extends the functionality of the package to allow for faster, more versatile, and more specific requests. Users may now use a much larger set of filter parameters in making requests. Additionally, Version 2.0.0 tries to address the problem of user-friendliness by introducing more package documentation with suggested workflows and example vignettes.
-
-For now, Version 2.0.0 is available only as a fork of the main package.
+In addition to correcting these major problems, Version 2 also extends the functionality of the package to allow for both broader requests and more specific requests than were possible in Version 1. Users may now use a much larger set of filter parameters in making requests. Additionally, Version 2 tries to address the problem of user-friendliness by introducing more package documentation with suggested workflows and example vignettes.
 
 ## Installation
 
-To install the development version of imfr, use:
+To install the development version of `imfr`, use:
 
 ``` {r install_package, eval = FALSE}
-devtools::install_github("chriscarrollsmith/imfr", build_vignettes = TRUE)'
+devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)'
 ```
 
 ## Usage
 
 ### Suggested packages
 
-I recommend using imfr in combination with the tidyverse, stringr, and knitr libraries, which introduces a powerful set of functions for viewing and manipulating the data types returned by imfr functions. Each of these packages can be installed from the CRAN repository using the `install.packages` function. Once they are installed, load these packages using the `library` function:
+We recommend using `imfr` in combination with the `tidyverse`, `stringr`, and `knitr` libraries, which introduce a powerful set of functions for viewing and manipulating the data types returned by `imfr` functions. Each of these packages can be installed from the CRAN repository using the `install.packages` function. Once they are installed, load these packages using the `library` function:
 
 ```{r load_libraries}
 # Load libraries
@@ -54,7 +52,7 @@ library(knitr)
 
 ### Fetching an Index of Databases with the imf_databases Function
 
-The imfr package introduces four core functions: `imf_databases`, `imf_parameters`, `imf_parameter_defs`, and `imf_data`. The function for downloading datasets is `imf_data`, but you will need the other functions to determine what arguments to supply to `imf_data`. For instance, all calls to `imf_data` require a database_id. This is because the IMF serves many different databases through its API, and the API needs to know which of these many databases you're requesting data from. To obtain a list of databases, use `imf_databases`, like so:
+The `imfr` package introduces four core functions: `imf_databases`, `imf_parameters`, `imf_parameter_defs`, and `imf_dataset`. The function for downloading datasets is `imf_dataset`, but you will need the other functions to determine what arguments to supply to `imf_dataset`. For instance, all calls to `imf_dataset` require a `database_id`. This is because the IMF serves many different databases through its API, and the API needs to know which of these many databases you're requesting data from. To obtain a list of databases, use `imf_databases`, like so:
 
 ```{r imf_databases}
 #Fetch the list of databases available through the IMF API
@@ -85,7 +83,7 @@ kable(commodity_db)
 
 ### Fetching a List of Parameters and Input Codes with imf_parameters and imf_parameter_defs
 
-Once you have a database_id, it's possible to make a call to `imf_data` to fetch the entire database: `imf_data(commodity_db$database_id)`. However, while this will succeed for some small databases, it will fail for many of the larger ones. And even when it succeeds, fetching an entire database can take a long time. You're much better off supplying additional filter parameters to reduce the size of your request.
+Once you have a database_id, it's possible to make a call to `imf_dataset` to fetch the entire database: `imf_dataset(commodity_db$database_id)`. However, while this will succeed for some small databases, it will fail for many of the larger ones. And even when it succeeds, fetching an entire database can take a long time. You're much better off supplying additional filter parameters to reduce the size of your request.
 
 Requests to databases available through the IMF API are complicated by the fact that each database uses a different set of parameters when making a request. There are, in fact, `r  length(unique(!is.na(parameter_defs$parameter)))` unique parameters used in different database requests! You also have to have the list of valid input codes for each parameter. The `imf_parameters` function solves this problem. Use the function to obtain the full list of parameters and valid input codes for a given database:
 
@@ -119,11 +117,11 @@ Each named list item is a data frame containing a vector of valid input codes th
 kable(params$freq)
 ```
 
-### Supplying Parameter Arguments to imf_data: A Tale of Two Workflows
+### Supplying Parameter Arguments to imf_dataset: A Tale of Two Workflows
 
-There are two ways to supply parameters to `imf_data`: by supplying vector arguments or by supplying a modified parameters list.
+There are two ways to supply parameters to `imf_dataset`: by supplying vector arguments or by supplying a modified parameters list. The vector arguments workflow will likely be more intuitive for most users, but the list argument workflow is more robust against changes to the API endpoint. If you ever get an "unused argument" error when trying to use the vector arguments workflow, try using the list argument workflow instead.
 
-To supply vector arguments, just find the codes you want and supply them to `imf_data` using the parameter name as the argument name. The example below shows how to request 2000–2015 annual coal prices from the Primary Commodity Price System database:
+To supply vector arguments, just find the codes you want and supply them to `imf_dataset` using the parameter name as the argument name. The example below shows how to request 2000–2015 annual coal prices from the Primary Commodity Price System database:
 
 ```{r annual_coal_vectors}
 # Fetch the 'freq' input code for annual frequency
@@ -136,7 +134,7 @@ selected_commodity <- params$commodity$input_code[str_detect(tolower(params$comm
 selected_unit_measure <- params$unit_measure$input_code[str_detect(tolower(params$unit_measure$description),"index")]
 
 # Request data from the API
-df <- imf_data(database_id = commodity_db$database_id,
+df <- imf_dataset(database_id = commodity_db$database_id,
          freq = selected_freq, commodity = selected_commodity,
          unit_measure = selected_unit_measure,
          start_year = 2000, end_year = 2015)
@@ -145,7 +143,7 @@ df <- imf_data(database_id = commodity_db$database_id,
 kable(head(df))
 ```
 
-To supply a list object, modify each data frame in the `params` list object to retain only the rows you want, and then supply the modified list object to `imf_data` as its `parameters` argument. Here is how to make the same request for annual coal price data using a parameters list:
+To supply a list object, modify each data frame in the `params` list object to retain only the rows you want, and then supply the modified list object to `imf_dataset` as its `parameters` argument. Here is how to make the same request for annual coal price data using a parameters list:
 
 ```{r annual_coal_list}
 # Filter the frequency data frame for annual frequency
@@ -161,7 +159,7 @@ params$unit_measure <- params$unit_measure %>%
     filter(str_detect(tolower(.$description),"index"))
 
 # Request data from the API
-df <- imf_data(database_id = commodity_db$database_id,
+df <- imf_dataset(database_id = commodity_db$database_id,
                parameters = params,
          start_year = 2000, end_year = 2015)
 
@@ -177,8 +175,7 @@ See also the vignettes, which can be accessed with `vignette("ParametersList")` 
 
 Planned features for future versions:
 
-* Add backward compatibility with Version 1 of imfr
-* Add a workaround to support for "All" codes that are listed as valid input codes in the IMF parameters lists but don't actually work when used in API requests
-* Determine maximum length of a request URL, and do multiple requests if the URL is too long
-* Add systematic feature testing
-* Hopefully merge Version 2 onto the main Github branch for the imfr package and submit to CRAN
+* Add a workaround to support "All" codes that are listed as valid input codes in the IMF parameters lists but don't actually work when used in API requests
+* Determine maximum length of a request URL, and split into multiple requests if the URL is too long
+* Submit to CRAN
+* Call to `http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%database_id%` in `imf_parameters` to get all parameter names and values with a single API call (and thus reduce the need for throttling to avoid hitting the API rate limit.)

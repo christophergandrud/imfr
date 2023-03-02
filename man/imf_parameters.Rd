@@ -11,6 +11,9 @@ imf_parameters(database_id, times = 3)
 \code{\link{imf_databases}}.}
 
 \item{times}{numeric. Maximum number of API requests to attempt.}
+
+\item{include_defs}{logical. Whether to include a data frame of parameter
+definitions as in the returned list as its final item.}
 }
 \value{
 Returns a named list of data frames. Each list item name corresponds
@@ -31,9 +34,9 @@ parameters for requests from a given database available through the IMF API.
 Each data frame in the returned list has an \code{input_code} column and a
 \code{description} column. Retrieve the list, filter each data frame for the
 parameters you want, and then supply the modified list object to the
-\code{\link{imf_data}} function as its \code{parameters} argument.
+\code{\link{imf_dataset}} function as its \code{parameters} argument.
 Alternatively, individually supply \code{input_code} values from each data
-frame as arguments to \code{imf_data}.
+frame as arguments to \code{imf_dataset}.
 }
 \examples{
 # Open a viewing pane with the full list of indicator codes and descriptions

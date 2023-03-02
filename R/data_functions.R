@@ -2,6 +2,8 @@
 #'
 #' @description List IMF database IDs and descriptions
 #'
+#' @param return_raw logical. Whether to return the raw dataflow list or a
+#' data frame with database IDs and names.
 #' @param times numeric. Maximum number of API requests to attempt.
 #'
 #' @return Returns a data frame with \code{database_id} and text
@@ -18,8 +20,8 @@
 #' @export
 
 imf_databases <- function(times = 3) {
-    url <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow'
-    raw_dl <- download_parse(url, times)
+    URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow'
+    raw_dl <- download_parse(URL, times)
 
     database_id <- raw_dl$Structure$Dataflows$Dataflow$KeyFamilyRef$KeyFamilyID
     description <- raw_dl$Structure$Dataflows$Dataflow$Name$`#text`
@@ -38,13 +40,15 @@ imf_databases <- function(times = 3) {
 #' Each data frame in the returned list has an \code{input_code} column and a
 #' \code{description} column. Retrieve the list, filter each data frame for the
 #' parameters you want, and then supply the modified list object to the
-#' \code{\link{imf_data}} function as its \code{parameters} argument.
+#' \code{\link{imf_dataset}} function as its \code{parameters} argument.
 #' Alternatively, individually supply \code{input_code} values from each data
-#' frame as arguments to \code{imf_data}.
+#' frame as arguments to \code{imf_dataset}.
 #'
 #' @param database_id character string of a \code{database_id} from
 #' \code{\link{imf_databases}}.
 #' @param times numeric. Maximum number of API requests to attempt.
+#' @param include_defs logical. Whether to include a data frame of parameter
+#' definitions as in the returned list as its final item.
 #'
 #' @return Returns a named list of data frames. Each list item name corresponds
 #' to an input parameter for API requests from the database. All list items are
@@ -74,14 +78,22 @@ imf_parameters <- function(database_id, times = 3) {
              call. = FALSE)
     }
 
-    url <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
-    codelist <- imf_codelist(database_id)
+    URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
+    tryCatch({codelist <- imf_dimensions(database_id,times)}, error = function(e) {
+        if(e$message == "Unable to find what you're looking for."){
+            stop(paste(e$message,'Did you supply a valid database_id? Use imf_databases to find.'),
+                 call. = FALSE)
+        }else{
+            stop(e,
+                 call. = FALSE)
+        }
+    })
     parameterlist <- map(1:nrow(codelist), function(k) {
         if(codelist$parameter[k] == "freq"){
             data.frame(input_code = c("A","M","Q"),
                        description = c("Annual","Monthly","Quarterly"))
         }else{
-            raw <- download_parse(paste0(url,codelist$code[k]), times = times)$Structure$CodeLists$CodeList$Code
+            raw <- download_parse(paste0(URL,codelist$code[k]), times)$Structure$CodeLists$CodeList$Code
             data.frame(input_code = raw$`@value`,
                        description = raw$Description$`#text`)
         }
@@ -98,6 +110,8 @@ imf_parameters <- function(database_id, times = 3) {
 #' @param database_id character string of a \code{database_id} from
 #' \code{\link{imf_databases}}.
 #' @param times numeric. Maximum number of API requests to attempt.
+#' @param inputs_only logical. Whether to return only parameters used as inputs
+#' in API requests, or also output variables.
 #'
 #' @return Returns a data frame of input parameters used in making API requests
 #' from a given IMF database, along with text descriptions or definitions of
@@ -116,14 +130,14 @@ imf_parameters <- function(database_id, times = 3) {
 #'
 #' @export
 
-imf_parameter_defs <- function(database_id, times = 3) {
+imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
     if (missing(database_id)){
         stop('Must supply database_id.\nUse imf_databases to find.',
              call. = FALSE)
     }
 
-    url <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
-    parameterlist <- imf_codelist(database_id) %>%
+    URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
+    parameterlist <- imf_dimensions(database_id,times) %>%
         select(parameter,description)
     return(parameterlist)
 }
@@ -133,7 +147,7 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #' @description Function to request data from a database through the IMF API endpoint.
 #'
 #' @usage
-#' imf_data(database_id, parameters, start_year, end_year)
+#' imf_dataset(database_id, parameters, start_year, end_year)
 #'
 #' @details Only the \code{database_id} argument is strictly required; all other
 #' arguments are optional. If you provide a \code{database_id} without any other
@@ -148,7 +162,7 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #' There are two ways to supply parameters for your API request. The optimal way
 #' is to retrieve a list of data frames using \code{\link{imf_parameters}},
 #' filter each data frame to retain only the parameters you want, and then
-#' supply the modified list object to \code{imf_data} as its \code{parameters}
+#' supply the modified list object to \code{imf_dataset} as its \code{parameters}
 #' argument. However, users who are not comfortable modifying data frames in a
 #' nested list may find it easier to instead supply one or more character
 #' vectors as arguments, as in the example in the previous paragraph. (There are
@@ -171,6 +185,10 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #' to request data.
 #' @param end_year integer four-digit year. Latest year for which you would like to
 #' request data.
+#' @param return_raw logical. Whether to return the raw list returned by the API
+#' instead of a cleaned-up data frame. This argument exists strictly for
+#' purposes of backward compatibility with earlier versions of \pkg{imfr} and
+#' will be discontinued in a future version.
 #' @param print_url logical. Whether to print the URL used in the API call.
 #' Can be useful for debugging.
 #' @param times numeric. Maximum number of requests to attempt.
@@ -187,22 +205,22 @@ imf_parameter_defs <- function(database_id, times = 3) {
 #' params <- imf_parameters(database_id = 'BOP')
 #' params$indicator <- filter(params$indicator,
 #'                            description == 'Assets (with Fund Record), National Currency')
-#' df <- imf_data(database_id = 'BOP', parameters = params)
+#' df <- imf_dataset(database_id = 'BOP', parameters = params)
 #'
 #' # Retrieve "Assets (with Fund Record), National Currency" series from the
 #' # Balance of Payments database using the character vector method
 #' params <- imf_parameters(database_id = 'BOP')
 #' indicator_code <- filter(params$indicator,
 #'                            description == 'Assets (with Fund Record), National Currency')$input_code
-#' df <- imf_data(database_id = 'BOP', indicator = indicator_code)
+#' df <- imf_dataset(database_id = 'BOP', indicator = indicator_code)
 #'
 #' @importFrom dplyr %>% filter bind_cols select
 #' @importFrom purrr map walk
 #'
 #' @export
 
-imf_data <- function(database_id, parameters, start_year, end_year,
-                     print_url = FALSE, times = 3,
+imf_dataset <- function(database_id, parameters, start_year, end_year,
+                     return_raw = FALSE, print_url = FALSE, times = 3,
                      accounting_entry, activity, adjustment, age,
                      classification, cofog_function, commodity, comp_method,
                      composite_breakdown, counterpart_area, counterpart_sector,
@@ -215,6 +233,9 @@ imf_data <- function(database_id, parameters, start_year, end_year,
                      ref_sector, reporting_type, series, sex, sto,
                      summary_statistics, survey, transformation, type,
                      unit_measure, urbanisation, valuation) {
+    if(missing(database_id)){
+        stop("Missing required database_id argument.",call.=F)
+        }
     if (!(inherits(database_id, "character"))){
         stop("database_id must be a character string.",
              call. = FALSE)
@@ -227,28 +248,28 @@ imf_data <- function(database_id, parameters, start_year, end_year,
     if(!missing(start_year) & !missing(end_year)){
         suppressWarnings(start <- as.integer(start_year))
         suppressWarnings(end <- as.integer(end_year))
-        years <- c(start_year = start_year,end_year = end_year)
+        years <- list(start_year = start_year,end_year = end_year)
     }else if(!missing(start_year)){
         suppressWarnings(start <- as.integer(start_year))
-        years <- c(start_year = start_year)
+        years <- list(start_year = start_year)
     }else if(!missing(end_year)){
         suppressWarnings(end <- as.integer(end_year))
-        years <- c(end_year = end_year)
+        years <- list(end_year = end_year)
     }else{
-        years <- c()
+        years <- list()
     }
-    walk(years,function(x){
+    for(x in years){
         if(!(length(x) == 1L)){
-            stop(paste(names(x),"must be a four-digit year, not a vector."),
+            stop("start_year and/or end_year must be a four-digit year, not a vector.",
                  call. = FALSE)
         }else if(is.na(x)){
-            stop(paste("Failed to coerce",names(x),"to a four-digit integer."),
+            stop("Failed to coerce start_year and/or end_year to a four-digit integer.",
                  call. = FALSE)
         }else if(!(nchar(x) == 4L)){
-            stop(paste("Failed to coerce",names(x),"to a four-digit integer."),
+            stop("Failed to coerce start_year and/or end_year to a four-digit integer.",
                  call. = FALSE)
         }
-    })
+    }
 
     vector_vars <- c("accounting_entry", "activity", "adjustment", "age",
     "classification", "cofog_function", "commodity", "comp_method",
@@ -282,15 +303,18 @@ imf_data <- function(database_id, parameters, start_year, end_year,
 Character vector parameters arguments will be ignored.",immediate.=T)
     }
     if(!missing(parameters)){
-        if(class(parameters) != "list" | any(is.null(names(parameters))) |
-           class(parameters[[1]]) != "data.frame" |
-           !all(names(parameters[[1]]) == c("input_code","description"))){
-            stop("parameters argument must be a named list of data frames, each with columns \'input_code\' and \'description\'.",
-                 call. = FALSE)
-        }
+        walk(1:length(parameters),function(x){
+            if(S3Class(parameters) != "list" | any(is.null(names(parameters))) |
+               S3Class(parameters[[1]]) != "data.frame" |
+               !all(names(parameters[[1]]) == c("input_code","description"))){
+                stop("parameters argument must be a named list of data frames, each with columns \'input_code\' and \'description\'.",
+                     call. = FALSE)
+            }
+        })
     }
 
-    data_dimensions <- imf_parameters(database_id)
+    data_dimensions <- imf_parameters(database_id,times)
+
     if(supplied_list){
         if(any(!(names(parameters) %in% names(data_dimensions)))){
             stop(paste0(paste(names(parameters)[which(!(names(parameters) %in% names(data_dimensions)))],collapse = ", ")," not valid parameter(s) for the ",database_id," database.
@@ -330,7 +354,7 @@ Use imf_parameters(\'",database_id,"\') to get valid parameters."),
                     warning(paste0(sum(!(eval(parse(text = name_vector[x])) %in% df$input_code)),
 " invalid user-supplied input code(s) for ",name_vector[x]," parameter will be ignored.
 Use imf_parameters(\'",database_id,"\')$",name_vector[x]," to see all valid input codes for this parameter.
-Note that codes are case sensitive.",immediate.=T))
+Note that codes are case sensitive."),immediate.=T)
                 }
                 df <- if(nrow(df) == nrow(data_dimensions[[x]])){
                     data.frame(input_code = c(),description = c())
@@ -343,7 +367,7 @@ Note that codes are case sensitive.",immediate.=T))
         names(data_dimensions) <- name_vector
     }else{
         warning("User supplied no filter parameters for the API request.
-imf_data will attempt to request the entire database.",immediate.=T)
+imf_dataset will attempt to request the entire database.",immediate.=T)
         name_vector <- names(data_dimensions)
         data_dimensions <- map(1:length(data_dimensions),function(x){
             data.frame(input_code = c(),description = c())
@@ -354,42 +378,61 @@ imf_data will attempt to request the entire database.",immediate.=T)
     parameter_string <- paste(unlist(map(1:length(data_dimensions),function(x){
         paste(data_dimensions[[x]]$input_code,collapse="+")
     })),collapse=".")
-    url <- paste0('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/',database_id,'/',
+    URL <- paste0('http://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/',database_id,'/',
                   parameter_string,
                   if(!missing(start_year) | !missing(end_year)){'?'}else{''},
                   if(!missing(start_year)){paste0('startPeriod=',start)}else{''},
                   if(!missing(start_year) & !missing(end_year)){paste0('&endPeriod=',end)}
                   else if(missing(start_year) & !missing(end_year)){paste0('endPeriod=',end)}
                   else{''})
-    if(print_url){print(url)}
+    if(print_url){print(URL)}
 
-    raw_dl <- download_parse(url)$CompactData$DataSet$Series
-    if(!is.data.frame(raw_dl$Obs)){
+    raw_dl <- download_parse(URL,times=times)$CompactData$DataSet$Series
+    if(is.null(raw_dl)){
+        stop("No data found for that combination of parameters. Try making your request less restrictive.",call.=F)
+    }
+    if(return_raw == T){
+        return(raw_dl)
+    }
+    raw_dl_names <- names(raw_dl[1:(length(raw_dl)-1)])
+    if(S3Class(raw_dl$Obs) == "list"){
         df <- map_dfr(1:length(raw_dl$Obs),function(n){
-            df <- raw_dl$Obs[[n]] %>%
-                select(date = `@TIME_PERIOD`,
-                       value = `@OBS_VALUE`)
+            if(S3Class(raw_dl$Obs[[n]]) == "list"){
+                df <- as.data.frame(raw_dl$Obs[[n]]) %>%
+                    select(date = `X.TIME_PERIOD`,
+                           value = `X.OBS_VALUE`)
+            }else{
+                df <- raw_dl$Obs[[n]] %>%
+                    select(date = `@TIME_PERIOD`,
+                           value = `@OBS_VALUE`)
+            }
             tmp <- as.data.frame(
-                map(.x = name_vector,.f = function(variable_name){
-                    vec <- rep(raw_dl[[paste0("@",toupper(variable_name))]][n],times=nrow(df))
+                map(.x = raw_dl_names,.f = function(variable_name){
+                    vec <- rep(raw_dl[[variable_name]][n],times=nrow(df))
                     return(vec)
                 })
             )
-            names(tmp) <- name_vector
+            names(tmp) <- tolower(gsub("@","",raw_dl_names))
             df <- bind_cols(df,tmp)
-            return(df)
         })
+    }else if(S3Class(raw_dl$Obs) == "data.frame" & nrow(raw_dl$Obs) == length(raw_dl[[1]])){
+        df <- raw_dl$Obs %>%
+            select(date = `@TIME_PERIOD`,
+                   value = `@OBS_VALUE`)
+        tmp <- as.data.frame(raw_dl[names(raw_dl)[1:(length(raw_dl)-1)]])
+        names(tmp) <- tolower(gsub("@","",raw_dl_names))
+        df <- bind_cols(df,tmp)
     }else{
         df <- raw_dl$Obs %>%
             select(date = `@TIME_PERIOD`,
                    value = `@OBS_VALUE`)
         tmp <- as.data.frame(
-            map(.x = name_vector,.f = function(variable_name){
-                vec <- rep(raw_dl[[paste0("@",toupper(variable_name))]],times=nrow(df))
+            map(.x = raw_dl_names,.f = function(variable_name){
+                vec <- rep(raw_dl[[variable_name]],times=nrow(df))
                 return(vec)
             })
         )
-        names(tmp) <- name_vector
+        names(tmp) <- tolower(gsub("@","",raw_dl_names))
         df <- bind_cols(df,tmp)
     }
     return(df)

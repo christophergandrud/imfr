@@ -5,8 +5,8 @@
 #' @importFrom dplyr %>%
 #' @noRd
 
-download_parse <- function(url, times = 3) {
-    raw_download <- RETRY('GET', url, user_agent(''), times = times) %>%
+download_parse <- function(URL, times = 3) {
+    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 3) %>%
         content(as='text',econding='UTF-8')
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {
@@ -29,17 +29,16 @@ download_parse <- function(url, times = 3) {
     return(json_parsed)
 }
 
-#' Retrieve the list of codes (codelist) for dimensions of an individual IMF
-#' database.
+#' Retrieve the list of codes for dimensions of an individual IMF database.
 #'
-#' @importFrom dplyr %>% left_join
+#' @importFrom dplyr %>% left_join full_join
 #'
 #' @noRd
 
-imf_codelist <- function(database_id, times = 3, inputs_only=T) {
-    url <- paste0('http://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/',
+imf_dimensions <- function(database_id, times = 3, inputs_only=T) {
+    URL <- paste0('http://dataservices.imf.org/REST/SDMX_JSON.svc/DataStructure/',
                   database_id)
-    raw_dl <- download_parse(url, times)
+    raw_dl <- download_parse(URL, times)
 
     code <- raw_dl$Structure$CodeLists$CodeList$`@id`
     description <- raw_dl$Structure$CodeLists$CodeList$Name$`#text`
@@ -51,5 +50,9 @@ imf_codelist <- function(database_id, times = 3, inputs_only=T) {
             left_join(codelist_df) %>%
             suppressMessages() %>%
             return()
-    }else {return(codelist_df)}
+    }else {data.frame(parameter = tolower(raw_dl$Structure$KeyFamilies$KeyFamily$Components$Dimension$`@conceptRef`),
+                      code = raw_dl$Structure$KeyFamilies$KeyFamily$Components$Dimension$`@codelist`) %>%
+            full_join(codelist_df) %>%
+            suppressMessages() %>%
+            return()}
 }
