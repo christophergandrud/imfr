@@ -284,3 +284,4 @@ Planned features for future versions:
   in `imf_parameters` to get all parameter names and values with a
   single API call (and thus reduce the need for throttling to avoid
   hitting the API rate limit.)
+- Add a metadata function.  
