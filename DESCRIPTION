@@ -7,12 +7,12 @@ Description: Explore and download data from the International Monetary Fund's
 Date: 2023-02-14
 Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
-    role = c("aut")),
+    role = c("aut", "cre")),
     person("Christopher", "Smith", email = "chriscarrollsmith@gmail.com",
     role = c("aut", "cre"))
     )
-URL: https://github.com/chriscarrollsmith/imfr
-BugReports: https://github.com/chriscarrollsmith/imfr/issues
+URL: https://github.com/christophergandrud/imfr
+BugReports: https://github.com/christophergandrud/imfr/issues
 License: GPL (>= 3)
 Imports:
     dplyr,
