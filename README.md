@@ -38,7 +38,7 @@ suggested workflows and example vignettes.
 To install the development version of `imfr`, use:
 
 ``` r
-devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)'
+devtools::install_github("chriscarrollsmith/imfr", build_vignettes = TRUE)'
 ```
 
 ## Usage
@@ -273,15 +273,18 @@ See also the vignettes, which can be accessed with
 
 Planned features for future versions:
 
-- Add a workaround to support “All” codes that are listed as valid input
-  codes in the IMF parameters lists but don’t actually work when used in
-  API requests
-- Determine maximum length of a request URL, and split into multiple
-  requests if the URL is too long
-- Submit to CRAN
+- Add backward compatibility for imf_countries, imf_metastructure, and 
+  imf_metadata. Test that function outputs are identical to original 
+  package.
 - Call to
   `http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%database_id%`
   in `imf_parameters` to get all parameter names and values with a
   single API call (and thus reduce the need for throttling to avoid
   hitting the API rate limit.)
-- Add a metadata function.  
+- Merge to main branch 
+- Submit to CRAN
+- Add a workaround to support “All” codes that are listed as valid input
+  codes in the IMF parameters lists but don’t actually work when used in
+  API requests
+- Determine maximum length of a request URL, and split into multiple
+  requests if the URL is too long 
