@@ -10,8 +10,6 @@ Version](http://www.r-pkg.org/badges/version/imfr)](https://cran.r-project.org/p
 Downloads](http://cranlogs.r-pkg.org/badges/last-month/imfr) ![CRAN
 Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/imfr)
 
-# imfr
-
 Originally created by Christopher Gandrud, imfr is an R package for
 downloading data from the [International Monetary
 Funds’s](http://data.imf.org/) [RESTful JSON
@@ -215,7 +213,12 @@ df <- imf_dataset(database_id = commodity_db$database_id,
          freq = selected_freq, commodity = selected_commodity,
          unit_measure = selected_unit_measure,
          start_year = 2000, end_year = 2015)
+```
 
+    ## Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
+    ## Request failed [ERROR]. Retrying in 1 seconds...
+
+``` r
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
 ```
