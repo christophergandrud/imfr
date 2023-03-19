@@ -19,7 +19,8 @@ Imports:
     httr (>= 1.2.0),
     jsonlite,
     purrr,
-    ratelimitr
+    ratelimitr,
+    tidyr
 LazyData: TRUE
 RoxygenNote: 7.2.3
 Suggests: 
