@@ -10,10 +10,6 @@
 #' @examples
 #' # Return first 6 IMF database IDs and descriptions
 #' head(imf_databases())
-#'\dontrun{
-#' # Open a viewing pane with the full list of IMF database IDs and descriptions
-#' View(imf_databases())
-#' }
 #'
 #' @export
 

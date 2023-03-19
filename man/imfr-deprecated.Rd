@@ -127,40 +127,24 @@ future version. Use \code{imf_dataset(include_metadata = TRUE)} instead.
 }
 
 \examples{
-head(imf_ids())
+suppressWarnings(head(imf_ids()))
 
-\dontrun{
-# Find Balance of Payments database data structure
-imf_codelist(database_id = 'BOP')
-}
+#' # Find Primary Commodity Price System database data structure
+suppressWarnings(imf_codelist(database_id = 'PCPS'))
+
 # Retrieve indicators from BOP database
-test = imf_codes(codelist = 'CL_INDICATOR_BOP')
+suppressWarnings(imf_codes(codelist = 'CL_INDICATOR_BOP'))
 
 # Download Real Effective Exchange Rate (CPI base) for the UK and China
 # at an annual frequency
-real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-               country = c('CN', 'GB'), freq = 'A')
+suppressWarnings(imf_data(database_id = 'IFS', indicator = 'EREER_IX',
+               country = c('CN', 'GB'), freq = 'A'))
 
-\dontrun{
-# Also download Interest Rates, Lending Rate, Percent per annum
-ex_interest <- imf_data(database_id = 'IFS',
-                         indicator = c('FILR_PA', 'EREER_IX'),
-                         freq = 'M')
-}
-\dontrun{
-# Find Balance of Payments database data structure
-imf_metastructure(database_id = 'BOP')
-}
-\dontrun{
-# Find Balance of Payments database metadata
-imf_metadata(database_id = 'BOP')
-}
-}
-\seealso{
-\code{\link{imf_ids}}
+# Find Primary Commodity Price System database data structure
+suppressWarnings(imf_metastructure(database_id = 'PCPS'))
 
-\code{\link{imf_ids}}
+# Find Primary Commodity Price System database metadata
+suppressWarnings(imf_metadata(database_id = 'PCPS'))
 
-\code{\link{imf_databases}}
 }
 \keyword{internal}
