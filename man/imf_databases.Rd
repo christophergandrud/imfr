@@ -8,9 +8,6 @@ imf_databases(times = 3)
 }
 \arguments{
 \item{times}{numeric. Maximum number of API requests to attempt.}
-
-\item{return_raw}{logical. Whether to return the raw dataflow list or a
-data frame with database IDs and names.}
 }
 \value{
 Returns a data frame with \code{database_id} and text

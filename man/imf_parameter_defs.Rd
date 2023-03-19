@@ -29,7 +29,7 @@ requests from a given IMF database
 }
 \examples{
 # Get names and text descriptions of parameters used in IMF API calls to the
-Balance of Payments database
-imf_parameter_defs(database_id = 'BOP'))
+# Balance of Payments database
+imf_parameter_defs(database_id = 'BOP')
 
 }

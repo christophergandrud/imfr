@@ -2,8 +2,6 @@
 #'
 #' @description List IMF database IDs and descriptions
 #'
-#' @param return_raw logical. Whether to return the raw dataflow list or a
-#' data frame with database IDs and names.
 #' @param times numeric. Maximum number of API requests to attempt.
 #'
 #' @return Returns a data frame with \code{database_id} and text
@@ -47,8 +45,6 @@ imf_databases <- function(times = 3) {
 #' @param database_id character string of a \code{database_id} from
 #' \code{\link{imf_databases}}.
 #' @param times numeric. Maximum number of API requests to attempt.
-#' @param include_defs logical. Whether to include a data frame of parameter
-#' definitions as in the returned list as its final item.
 #'
 #' @return Returns a named list of data frames. Each list item name corresponds
 #' to an input parameter for API requests from the database. All list items are
@@ -59,8 +55,8 @@ imf_databases <- function(times = 3) {
 #' descriptions of what each input code represents.
 #'
 #' @examples
-#' # Open a viewing pane with the full list of indicator codes and descriptions
-#' from the Balance of Payments database
+#' # Fetch the full list of indicator codes and descriptions for the Balance of
+#' # Payments database
 #' params <- imf_parameters(database_id = 'BOP')
 #' # Print names of parameters in the list
 #' names(params)
@@ -122,8 +118,8 @@ imf_parameters <- function(database_id, times = 3) {
 #'
 #' @examples
 #' # Get names and text descriptions of parameters used in IMF API calls to the
-#' Balance of Payments database
-#' imf_parameter_defs(database_id = 'BOP'))
+#' # Balance of Payments database
+#' imf_parameter_defs(database_id = 'BOP')
 #'
 #' @importFrom dplyr %>% select
 #' @importFrom purrr map
@@ -145,9 +141,6 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
 #' Download a data series from the IMF
 #'
 #' @description Function to request data from a database through the IMF API endpoint.
-#'
-#' @usage
-#' imf_dataset(database_id, parameters, start_year, end_year)
 #'
 #' @details Only the \code{database_id} argument is strictly required; all other
 #' arguments are optional. If you provide a \code{database_id} without any other
@@ -205,19 +198,11 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
 #' returns the raw JSON fetched from the API endpoint.
 #'
 #' @examples
-#' # Retrieve "Assets (with Fund Record), National Currency" series from the
-#' # Balance of Payments database using the list object method
-#' params <- imf_parameters(database_id = 'BOP')
-#' params$indicator <- filter(params$indicator,
-#'                            description == 'Assets (with Fund Record), National Currency')
-#' df <- imf_dataset(database_id = 'BOP', parameters = params)
-#'
-#' # Retrieve "Assets (with Fund Record), National Currency" series from the
-#' # Balance of Payments database using the character vector method
-#' params <- imf_parameters(database_id = 'BOP')
-#' indicator_code <- filter(params$indicator,
-#'                            description == 'Assets (with Fund Record), National Currency')$input_code
-#' df <- imf_dataset(database_id = 'BOP', indicator = indicator_code)
+#' # Retrieve "Current Account, Goods and Services, Services, Travel, Personal,
+#' # Other, Credit, US Dollars" for "United States" from the Balance of Payments
+#' # database using the character vector method
+#' df <- imf_dataset(database_id = 'BOP',ref_area = 'US',
+#'                   indicator = 'BXSTVPO_BP6_USD')
 #'
 #' @importFrom dplyr %>% filter bind_cols select
 #' @importFrom purrr map walk
@@ -409,13 +394,13 @@ imf_dataset will attempt to request the entire database.",immediate.=T)
     if(S3Class(raw_dl$Obs) == "list"){
         df <- map_dfr(1:length(raw_dl$Obs),function(n){
             if(S3Class(raw_dl$Obs[[n]]) == "list"){
-                df <- as.data.frame(raw_dl$Obs[[n]]) %>%
-                    select(date = `X.TIME_PERIOD`,
-                           value = `X.OBS_VALUE`)
+                df <- as.data.frame(raw_dl$Obs[[n]])
+                names(df)[names(df) %in% "X.TIME_PERIOD"] <- "date"
+                names(df)[names(df) %in% "X.OBS_VALUE"] <- "value"
             }else{
-                df <- raw_dl$Obs[[n]] %>%
-                    select(date = `@TIME_PERIOD`,
-                           value = `@OBS_VALUE`)
+                df <- raw_dl$Obs[[n]]
+                names(df)[names(df) %in% "@TIME_PERIOD"] <- "date"
+                names(df)[names(df) %in% "@OBS_VALUE"] <- "value"
             }
             tmp <- as.data.frame(
                 map(.x = raw_dl_names,.f = function(variable_name){
@@ -427,16 +412,16 @@ imf_dataset will attempt to request the entire database.",immediate.=T)
             df <- bind_cols(df,tmp)
         })
     }else if(S3Class(raw_dl$Obs) == "data.frame" & nrow(raw_dl$Obs) == length(raw_dl[[1]])){
-        df <- raw_dl$Obs %>%
-            select(date = `@TIME_PERIOD`,
-                   value = `@OBS_VALUE`)
+        df <- raw_dl$Obs
+        names(df)[names(df) %in% "@TIME_PERIOD"] <- "date"
+        names(df)[names(df) %in% "@OBS_VALUE"] <- "value"
         tmp <- as.data.frame(raw_dl[names(raw_dl)[1:(length(raw_dl)-1)]])
         names(tmp) <- tolower(gsub("@","",raw_dl_names))
         df <- bind_cols(df,tmp)
     }else{
-        df <- raw_dl$Obs %>%
-            select(date = `@TIME_PERIOD`,
-                   value = `@OBS_VALUE`)
+        df <- raw_dl$Obs
+        names(df)[names(df) %in% "@TIME_PERIOD"] <- "date"
+        names(df)[names(df) %in% "@OBS_VALUE"] <- "value"
         tmp <- as.data.frame(
             map(.x = raw_dl_names,.f = function(variable_name){
                 vec <- rep(raw_dl[[variable_name]],times=nrow(df))

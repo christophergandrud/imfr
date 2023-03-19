@@ -4,7 +4,59 @@
 \alias{imf_dataset}
 \title{Download a data series from the IMF}
 \usage{
-imf_dataset(database_id, parameters, start_year, end_year)
+imf_dataset(
+  database_id,
+  parameters,
+  start_year,
+  end_year,
+  return_raw = FALSE,
+  print_url = FALSE,
+  times = 3,
+  include_metadata = FALSE,
+  accounting_entry,
+  activity,
+  adjustment,
+  age,
+  classification,
+  cofog_function,
+  commodity,
+  comp_method,
+  composite_breakdown,
+  counterpart_area,
+  counterpart_sector,
+  currency_denom,
+  cust_breakdown,
+  disability_status,
+  education_lev,
+  expenditure,
+  financial_institution,
+  flow_stock_entry,
+  freq,
+  functional_cat,
+  gfs_sto,
+  income_wealth_quantile,
+  indicator,
+  instr_asset,
+  instrument_and_assets_classification,
+  int_acc_item,
+  maturity,
+  occupation,
+  prices,
+  product,
+  ref_area,
+  ref_sector,
+  reporting_type,
+  series,
+  sex,
+  sto,
+  summary_statistics,
+  survey,
+  transformation,
+  type,
+  unit_measure,
+  urbanisation,
+  valuation
+)
 }
 \arguments{
 \item{database_id}{character string. Database ID for database from which
@@ -75,18 +127,10 @@ arguments may be used in combination with a \code{parameters} list object;
 any other arguments will be ignored (and a warning thrown).
 }
 \examples{
-# Retrieve "Assets (with Fund Record), National Currency" series from the
-# Balance of Payments database using the list object method
-params <- imf_parameters(database_id = 'BOP')
-params$indicator <- filter(params$indicator,
-                           description == 'Assets (with Fund Record), National Currency')
-df <- imf_dataset(database_id = 'BOP', parameters = params)
-
-# Retrieve "Assets (with Fund Record), National Currency" series from the
-# Balance of Payments database using the character vector method
-params <- imf_parameters(database_id = 'BOP')
-indicator_code <- filter(params$indicator,
-                           description == 'Assets (with Fund Record), National Currency')$input_code
-df <- imf_dataset(database_id = 'BOP', indicator = indicator_code)
+# Retrieve "Current Account, Goods and Services, Services, Travel, Personal,
+# Other, Credit, US Dollars" for "United States" from the Balance of Payments
+# database using the character vector method
+df <- imf_dataset(database_id = 'BOP',ref_area = 'US',
+                  indicator = 'BXSTVPO_BP6_USD')
 
 }

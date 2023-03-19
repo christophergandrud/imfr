@@ -11,9 +11,6 @@ imf_parameters(database_id, times = 3)
 \code{\link{imf_databases}}.}
 
 \item{times}{numeric. Maximum number of API requests to attempt.}
-
-\item{include_defs}{logical. Whether to include a data frame of parameter
-definitions as in the returned list as its final item.}
 }
 \value{
 Returns a named list of data frames. Each list item name corresponds
@@ -39,8 +36,8 @@ Alternatively, individually supply \code{input_code} values from each data
 frame as arguments to \code{imf_dataset}.
 }
 \examples{
-# Open a viewing pane with the full list of indicator codes and descriptions
-from the Balance of Payments database
+# Fetch the full list of indicator codes and descriptions for the Balance of
+# Payments database
 params <- imf_parameters(database_id = 'BOP')
 # Print names of parameters in the list
 names(params)
