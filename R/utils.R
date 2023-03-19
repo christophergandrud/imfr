@@ -12,19 +12,23 @@ download_parse <- limit_rate(function(URL, times = 3) {
         content(as='text',econding='UTF-8')
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {
-        stop('data.imf.org appears to be down.', call. = FALSE)
+        stop(sprintf("data.imf.org appears to be down. URL: %s, Status: %s, Content: %s",
+                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
     }
 
     if (grepl('<!DOCTYPE HTML PUBLIC', raw_download)) {
-        stop('Unable to download series.', call. = FALSE)
+        stop(sprintf("Unable to download series. URL: %s, Status: %s, Content: %s",
+                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
     }
 
     if (grepl('<!DOCTYPE html>', raw_download)) {
-        stop('Unable to download series.', call. = FALSE)
+        stop(sprintf("Unable to download series. URL: %s, Status: %s, Content: %s",
+                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
     }
 
     if (grepl('<string xmlns="http://schemas.m', raw_download)) {
-        stop("Unable to find what you're looking for.", call. = FALSE)
+        stop(sprintf("Unable to find what you're looking for. URL: %s, Status: %s, Content: %s",
+                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
     }
 
     json_parsed <- fromJSON(raw_download)
