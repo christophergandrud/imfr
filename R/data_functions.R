@@ -206,6 +206,7 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
 #'
 #' @importFrom dplyr %>% filter bind_cols select
 #' @importFrom purrr map walk
+#' @importFrom methods S3Class
 #'
 #' @export
 
