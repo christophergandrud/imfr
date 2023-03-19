@@ -86,7 +86,7 @@ num_params <- length(unique_params)
 
 This function returns the IMF's listing of `r nrow(databases)` databases available through the API. (In reality, `r num_invalid` of the listed databases are defunct and not actually available: `r paste(invalid_dbs,collapse=", ")`.)
 
-To view and explore the database list, it's possible to open a viewing pane with `View(databases)` or to create an attractive table with `kintr::kable(databases)`. Or, if you already know which database you want, you can fetch the corresponding code by searching the description column for the database name with `stringr::str_detect`. For instance, here's how to search for the Primary Commodity Price System:
+To view and explore the database list, it's possible to open a viewing pane with `View(databases)` or to create an attractive table with `knitr::kable(databases)`. Or, if you already know which database you want, you can fetch the corresponding code by searching the description column for the database name with `stringr::str_detect`. For instance, here's how to search for the Primary Commodity Price System:
 
 ```{r commodity_id}
 # Filter the 'databases' data frame for descriptions matching `commodity price`
