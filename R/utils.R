@@ -3,9 +3,11 @@
 #' @importFrom httr RETRY progress user_agent content
 #' @importFrom jsonlite fromJSON
 #' @importFrom dplyr %>%
+#' @importFrom ratelimitr limit_rate rate
+#'
 #' @noRd
 
-download_parse <- function(URL, times = 3) {
+download_parse <- limit_rate(function(URL, times = 3) {
     raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 3) %>%
         content(as='text',econding='UTF-8')
 
@@ -27,7 +29,7 @@ download_parse <- function(URL, times = 3) {
 
     json_parsed <- fromJSON(raw_download)
     return(json_parsed)
-}
+}, rate(n = 10, period = 5))
 
 #' Retrieve the list of codes for dimensions of an individual IMF database.
 #'

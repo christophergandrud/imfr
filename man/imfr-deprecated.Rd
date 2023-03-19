@@ -5,6 +5,8 @@
 \alias{imf_codelist}
 \alias{imf_codes}
 \alias{imf_data}
+\alias{imf_metastructure}
+\alias{imf_metadata}
 \alias{imfr-deprecated}
 \title{List IMF database IDs}
 \usage{
@@ -25,15 +27,19 @@ imf_data(
   print_url = FALSE,
   times = 3
 )
+
+imf_metastructure(database_id, return_raw = FALSE, times = 3)
+
+imf_metadata(database_id, URL, times = 3, ...)
 }
 \arguments{
-\item{return_raw}{logical. Whether to return the data
-as an unprocessed list.}
+\item{return_raw}{logical. Whether to return the raw metadata
+structure list or a data frame with codelist codes and descriptions.}
 
 \item{times}{numeric. Maximum number of requests to attempt.}
 
-\item{database_id}{character string database ID. Can be found using
-\code{\link{imf_databases}}.}
+\item{database_id}{character string. database_id to request the header for.
+Can be found using \code{\link{imf_databases}}.}
 
 \item{codelist}{character string of a \code{codelist} from
 \code{\link{imf_codelist}}.}
@@ -56,6 +62,9 @@ all available countries.}
 
 \item{print_url}{logical. Whether to print the URL used in the API call.
 Can be useful for debugging.}
+
+\item{URL}{character string. Used internally by \code{imf_databases} to
+request header by request URL rather than by database_id.}
 }
 \value{
 If \code{return_raw = FALSE} then a data frame with the database IDs
@@ -74,6 +83,10 @@ If \code{return_raw = FALSE} then a data frame with just the
 requested data series are returned. If \code{return_raw = TRUE} then the raw
 data list is returned. This can include additional information about the
 series.
+
+If \code{return_raw = FALSE} then a data frame with the codelist IDs
+and descriptions is returned. If \code{return_raw = TRUE} then the raw
+data structure list is returned.
 }
 \description{
 The functions listed below are deprecated and will be defunct in
@@ -101,6 +114,18 @@ For \code{imf_codes}, use \code{\link{imf_parameters}}.
 For \code{imf_data}, use \code{\link{imf_dataset}}.
 }
 
+\section{\code{imf_metastructure}}{
+
+Function \code{imf_metastructure} will be discontinued in a future version
+for lack of evident use cases.
+}
+
+\section{\code{imf_metadata}}{
+
+Function \code{imf_metadata} is deprecated and will be discontinued in a
+future version. Use \code{imf_dataset(include_metadata = TRUE)} instead.
+}
+
 \examples{
 head(imf_ids())
 
@@ -122,8 +147,20 @@ ex_interest <- imf_data(database_id = 'IFS',
                          indicator = c('FILR_PA', 'EREER_IX'),
                          freq = 'M')
 }
+\dontrun{
+# Find Balance of Payments database data structure
+imf_metastructure(database_id = 'BOP')
+}
+\dontrun{
+# Find Balance of Payments database metadata
+imf_metadata(database_id = 'BOP')
+}
 }
 \seealso{
 \code{\link{imf_ids}}
+
+\code{\link{imf_ids}}
+
+\code{\link{imf_databases}}
 }
 \keyword{internal}

@@ -38,7 +38,7 @@ suggested workflows and example vignettes.
 To install the development version of `imfr`, use:
 
 ``` r
-devtools::install_github("chriscarrollsmith/imfr", build_vignettes = TRUE)'
+devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)'
 ```
 
 ## Usage
@@ -59,7 +59,7 @@ library(tidyverse)
 #> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 #> ✔ dplyr     1.1.0     ✔ readr     2.1.4
 #> ✔ forcats   1.0.0     ✔ stringr   1.5.0
-#> ✔ ggplot2   3.4.1     ✔ tibble    3.1.8
+#> ✔ ggplot2   3.4.1     ✔ tibble    3.2.0
 #> ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
 #> ✔ purrr     1.0.1     
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
@@ -108,7 +108,7 @@ kable(commodity_db)
 
 |     | database_id | description                           |
 |:----|:------------|:--------------------------------------|
-| 242 | PCPS        | Primary Commodity Price System (PCPS) |
+| 245 | PCPS        | Primary Commodity Price System (PCPS) |
 
 ### Fetching a List of Parameters and Input Codes with imf_parameters and imf_parameter_defs
 
@@ -131,6 +131,8 @@ valid input codes for a given database:
 ``` r
 # Fetch list of valid parameters and input codes for commodity price database
 params <- imf_parameters(commodity_db$database_id)
+#> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
+#> Request failed [ERROR]. Retrying in 4.3 seconds...
 ```
 
 The `imf_parameters` function returns a named list of data frames. Each
@@ -249,7 +251,7 @@ df <- imf_dataset(database_id = commodity_db$database_id,
                parameters = params,
          start_year = 2000, end_year = 2015)
 #> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-#> Request failed [ERROR]. Retrying in 4.8 seconds...
+#> Request failed [ERROR]. Retrying in 3.3 seconds...
 
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
@@ -264,6 +266,82 @@ kable(head(df))
 | 2004 | 82.9185858052862 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
 | 2005 | 71.9223526096731 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
 
+### Working with the Returned Data Frame
+
+Note that all columns in the returned data frame are character vectors,
+and that to plot the series we will need to convert to valid numeric or
+date formats:
+
+``` r
+#Coerce date and value columns to plottable formats and create a simple plot
+df %>%
+    mutate(date = as.Date(paste0(date,"-01-01")),
+           value = as.numeric(value)) %>%
+    ggplot(aes(x=date,y=value,color=commodity)) +
+    geom_line()
+```
+
+<img src="man/figures/README-plot-1.png" width="100%" />
+
+Also note that the returned data frame has mysterious-looking codes as
+values in some columns.
+
+Codes in the `time_format` column are [ISO 8601 duration
+codes](https://en.m.wikipedia.org/wiki/ISO_8601#Durations). In this
+case, “P1Y” means “periods of 1 year.” The `unit_mult` column represents
+the number of zeroes you should add to the `value` column. For instance,
+if `value` is in millions, then the unit multiplier will be 6. If in
+billions, then the unit multiplier will be 9.
+
+The meanings of the other codes are stored in our `params` object and
+can be fetched with a join. For instance to fetch the meaning of the
+ref_area code “W00”, we can perform a left join with the
+`params$ref_area` data frame and use `select` to replace ref_area with
+the parameter description:
+
+``` r
+# Join df with params$ref_area to fetch code description
+df <- left_join(df,params$ref_area,by=c("ref_area"="input_code")) %>%
+    select(date, value, freq, ref_area = description, commodity, unit_measure, unit_mult, time_format)
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+| date | value            | freq | ref_area                        | commodity | unit_measure | unit_mult | time_format |
+|:-----|:-----------------|:-----|:--------------------------------|:----------|:-------------|:----------|:------------|
+| 2000 | 39.3510230293202 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2001 | 49.3378587284039 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2002 | 39.4949091648006 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2003 | 43.2878876950788 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2004 | 82.9185858052862 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2005 | 71.9223526096731 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+
+Alternatively, we can simply replace the code in our data series with
+the corresponding description in `params`. Here, we replace each
+`unit_measure` code with the corresponding description in
+`params$unit_measure`:
+
+``` r
+# Replace each unique unit_measure code in df with corresponding description
+# in params$unit_measure
+for(code in unique(df$unit_measure)){
+    df$unit_measure[df$unit_measure == code] <- params$unit_measure$description[params$unit_measure$input_code == code]
+}
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+| date | value            | freq | ref_area                        | commodity | unit_measure | unit_mult | time_format |
+|:-----|:-----------------|:-----|:--------------------------------|:----------|:-------------|:----------|:------------|
+| 2000 | 39.3510230293202 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2001 | 49.3378587284039 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2002 | 39.4949091648006 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2003 | 43.2878876950788 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2004 | 82.9185858052862 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2005 | 71.9223526096731 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+
 ### View the imfr Vignettes Demonstrating the Two Workflows
 
 See also the vignettes, which can be accessed with
@@ -273,18 +351,9 @@ See also the vignettes, which can be accessed with
 
 Planned features for future versions:
 
-- Add backward compatibility for imf_countries, imf_metastructure, and 
-  imf_metadata. Test that function outputs are identical to original 
-  package.
-- Call to
-  `http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%database_id%`
-  in `imf_parameters` to get all parameter names and values with a
-  single API call (and thus reduce the need for throttling to avoid
-  hitting the API rate limit.)
-- Merge to main branch 
-- Submit to CRAN
 - Add a workaround to support “All” codes that are listed as valid input
   codes in the IMF parameters lists but don’t actually work when used in
   API requests
 - Determine maximum length of a request URL, and split into multiple
-  requests if the URL is too long 
+  requests if the URL is too long
+- Submit to CRAN

@@ -164,7 +164,7 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 #'                          indicator = c('FILR_PA', 'EREER_IX'),
 #'                          freq = 'M')
 #' }
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% arrange bind_cols
 #' @importFrom tidyr spread
 #'
 #' @rdname imfr-deprecated
@@ -178,8 +178,10 @@ imf_data <- function(database_id, indicator, country = 'all',
                      freq = 'A', return_raw = FALSE, print_url = FALSE,
                      times = 3) {
     .Deprecated("imf_dataset")
-    if(missing(database_id)){stop("database_id is a required argument.",
-                                  call. = FALSE)}
+    if(missing(database_id)){
+        stop("database_id is a required argument.",
+                                  call. = FALSE)
+    }
     param_defs <- imf_parameter_defs(database_id)
     geography_var <- param_defs$parameter[param_defs$description %in% c("Geographical Areas","Country")]
     indicator_var <- param_defs$parameter[param_defs$description == "Indicator"]
@@ -193,11 +195,31 @@ imf_data <- function(database_id, indicator, country = 'all',
     }else{
         geography_arg <- ""
     }
+    if(length(freq)>1){
+        stop('imf_data only works with one frequency at a time.',
+             call. = FALSE)
+    }
     df <- eval(parse(text=paste0("imf_dataset(database_id=database_id",indicator_arg,geography_arg,
                       ",start_year=start,end_year=end,freq=freq,return_raw=return_raw,print_url=print_url,times=times)")))
-    if(return_raw==T){return(df)}else{
+    if(return_raw==T){
+        return(df)
+    }else{
         if(geography_var %in% names(df)){
             names(df)[which(names(df) %in% geography_var)] <- "iso2c"
+        }
+        if(any(names(df)=="unit_measure")){
+            df <- df %>%
+                select(iso2c,date,unit_measure,value,indicator_var) %>%
+                spread(key = indicator_var,value="value") %>%
+                arrange(unit_measure)
+            tmp <- data.frame(unit_measure = df$unit_measure)
+            df <- df %>%
+                select(-unit_measure)
+            df <- bind_cols(df,tmp)
+        }else{
+            df <- df %>%
+                select(iso2c,date,value,indicator_var) %>%
+                spread(key = indicator_var,value="value")
         }
         if(freq == "A"){
             names(df)[which(names(df) == "date")] <- "year"
@@ -206,8 +228,102 @@ imf_data <- function(database_id, indicator, country = 'all',
         }else if(freq=="M"){
             names(df)[which(names(df) == "date")] <- "year_month"
         }
-        df <- df %>%
-            spread(key = indicator_var,value="value")
         return(df)
     }
+}
+
+#' Retrieve metadata structure for of an individual IMF database
+#'
+#' @param database_id character string of a \code{database_id} from
+#' \code{\link{imf_ids}}.
+#' @param return_raw logical. Whether to return the raw metadata
+#' structure list or a data frame with codelist codes and descriptions.
+#' @param times numeric. Maximum number of requests to attempt.
+#'
+#' @return If \code{return_raw = FALSE} then a data frame with the codelist IDs
+#' and descriptions is returned. If \code{return_raw = TRUE} then the raw
+#' data structure list is returned.
+#'
+#' @examples
+#' \dontrun{
+#' # Find Balance of Payments database data structure
+#' imf_metastructure(database_id = 'BOP')
+#' }
+#' @seealso \code{\link{imf_ids}}
+#'
+#' @rdname imfr-deprecated
+#' @section \code{imf_metastructure}:
+#' Function \code{imf_metastructure} will be discontinued in a future version
+#' for lack of evident use cases.
+#'
+#' @export
+
+imf_metastructure <- function(database_id, return_raw = FALSE, times = 3) {
+    .Deprecated()
+    if (missing(database_id))
+        stop('Must supply database_id.\n\nUse imf_ids to find.',
+             call. = FALSE)
+
+    URL <- sprintf(
+        'http://dataservices.imf.org/REST/SDMX_JSON.svc/MetadataStructure/%s',
+        database_id)
+    raw_dl <- download_parse(URL, times=times)
+
+    if (!isTRUE(return_raw)) {
+        codelist <- raw_dl$Structure$CodeLists$CodeList$`@id`
+        codelist_description <- raw_dl$Structure$CodeLists$CodeList$Name$`#text`
+
+        codelist_df <- data.frame(codelist = codelist,
+                                  description = codelist_description)
+        return(codelist_df)
+    }
+    else return(raw_dl)
+}
+
+#' Access metadata for a dataset
+#'
+#' @param database_id character string. database_id to request the header for.
+#' Can be found using \code{\link{imf_databases}}.
+#' @param URL character string. Used internally by \code{imf_databases} to
+#' request header by request URL rather than by database_id.
+#' @param times numeric. Maximum number of requests to attempt.
+#'
+#' @examples
+#' \dontrun{
+#' # Find Balance of Payments database metadata
+#' imf_metadata(database_id = 'BOP')
+#' }
+#' @seealso \code{\link{imf_databases}}
+#'
+#' @rdname imfr-deprecated
+#' @section \code{imf_metadata}:
+#' Function \code{imf_metadata} is deprecated and will be discontinued in a
+#' future version. Use \code{imf_dataset(include_metadata = TRUE)} instead.
+#'
+#' @export
+
+imf_metadata <- function(database_id, URL, times = 3, ...)
+{
+    .Deprecated("imf_dataset(include_metadata = TRUE)")
+    if(missing(database_id) & missing(URL)){
+        stop('Must supply database_id.\n\nUse imf_ids to find.',
+             call. = FALSE)
+    }
+    if(missing(URL)){
+        URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%s',
+                        database_id)
+    }else{
+        URL <- sub("CompactData","GenericMetadata",URL)
+    }
+    raw_dl <- download_parse(URL,times = times)
+
+    output <- list(XMLschema = raw_dl[["GenericMetadata"]][["@xmlns:xsd"]],
+                   message = raw_dl[["GenericMetadata"]][["@xsi:schemaLocation"]],
+                   language = raw_dl[["GenericMetadata"]][["Header"]][["Sender"]][["Name"]][["@xml:lang"]],
+                   timestamp = raw_dl[["GenericMetadata"]][["Header"]][["Prepared"]],
+                   custodian = raw_dl[["GenericMetadata"]][["Header"]][["Sender"]][["Name"]][["#text"]],
+                   custodian_url = raw_dl[["GenericMetadata"]][["Header"]][["Sender"]][["Contact"]][["URI"]],
+                   custodian_telephone = raw_dl[["GenericMetadata"]][["Header"]][["Sender"]][["Contact"]][["Telephone"]]
+    )
+        return(output)
 }

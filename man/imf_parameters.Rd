@@ -18,7 +18,7 @@ definitions as in the returned list as its final item.}
 \value{
 Returns a named list of data frames. Each list item name corresponds
 to an input parameter for API requests from the database. All list items are
-data frames, with an \code{input_value} column and a \code{description}
+data frames, with an \code{input_code} column and a \code{description}
 column. The \code{input_code} column is a character vector of all possible
 input codes for that parameter when making requests from the IMF API
 endpoint. The \code{descriptions} column is a character vector of text

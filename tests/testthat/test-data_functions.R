@@ -56,11 +56,20 @@ test_that("imf_dataset vector parameters request works",{
 })
 
 test_that("imf_dataset data frame prep works under all three conditions",{
-    if_condition <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("PPPSH","NGDPD"),start_year=2010,end_year=2012,times=3)
-    else_if_condition <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("PPPSH","NGDPD"),start_year=2010,end_year=2011,times=3)
-    else_condition <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("NGDPD"),start_year=2011,end_year=2012,times=5)
+    if_condition <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("PPPSH","NGDPD"),start_year=2010,end_year=2012)
+    else_if_condition <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("PPPSH","NGDPD"),start_year=2010,end_year=2011)
+    else_condition <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("NGDPD"),start_year=2011,end_year=2012)
     desired_names <- c("date","value","freq","ref_area","indicator","unit_mult","time_format")
     expect_equal(nrow(if_condition) == 4L & nrow(else_if_condition) == 2 & nrow(else_condition) == 2, TRUE)
     expect_equal(length(if_condition) == 7 & length(else_if_condition) == 7 & length(else_condition) == 7, TRUE)
     expect_equal(all(names(if_condition) %in% desired_names) & all(names(else_if_condition)  %in% desired_names) & all(names(else_condition)  %in% desired_names), TRUE)
+})
+
+test_that("imf_dataset include_metadata works",{
+    output <- imf_dataset(database_id = "WHDREO201910",freq="A",ref_area="US",indicator=c("PPPSH","NGDPD"),start_year=2010,end_year=2012,include_metadata=T)
+    expect_equal(S3Class(output) == "list", TRUE)
+    expect_equal(length(output) == 2, TRUE)
+    expect_equal(S3Class(output[[1]]) == "list", TRUE)
+    expect_equal(S3Class(output[[1]]) == "list", TRUE)
+    expect_equal(!any(is.na(output[[1]])), TRUE)
 })

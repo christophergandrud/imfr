@@ -52,7 +52,7 @@ imf_databases <- function(times = 3) {
 #'
 #' @return Returns a named list of data frames. Each list item name corresponds
 #' to an input parameter for API requests from the database. All list items are
-#' data frames, with an \code{input_value} column and a \code{description}
+#' data frames, with an \code{input_code} column and a \code{description}
 #' column. The \code{input_code} column is a character vector of all possible
 #' input codes for that parameter when making requests from the IMF API
 #' endpoint. The \code{descriptions} column is a character vector of text
@@ -190,14 +190,19 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
 #' purposes of backward compatibility with earlier versions of \pkg{imfr} and
 #' will be discontinued in a future version.
 #' @param print_url logical. Whether to print the URL used in the API call.
-#' Can be useful for debugging.
 #' @param times numeric. Maximum number of requests to attempt.
+#' @param include_metadata logical. Whether to return the database metadata
+#' header along with the data series.
 #' @param accounting_entry,activity,adjustment,age,classification,cofog_function,commodity,comp_method,composite_breakdown,counterpart_area,counterpart_sector,currency_denom,cust_breakdown,disability_status,education_lev,expenditure,financial_institution,flow_stock_entry,freq,functional_cat,gfs_sto,income_wealth_quantile,indicator,instr_asset,instrument_and_assets_classification,int_acc_item,maturity,occupation,prices,product,ref_area,ref_sector,reporting_type,series,sex,sto,summary_statistics,survey,transformation,type,unit_measure,urbanisation,valuation
 #' character vector. Use \code{imf_parameters} to identify which parameters to
 #' use for requests from a given database and to see all valid input codes for
 #' each parameter.
 #'
-#' @return Returns a tidy data frame with the data series.
+#' @return If return_raw == FALSE and include_metadata == FALSE, returns a tidy
+#' data frame with the data series. If return_raw == FALSE but
+#' include_metadata == TRUE, returns a list whose first item is the database
+#' header, and whose second item is the tidy data frame. If return_raw == TRUE,
+#' returns the raw JSON fetched from the API endpoint.
 #'
 #' @examples
 #' # Retrieve "Assets (with Fund Record), National Currency" series from the
@@ -221,6 +226,7 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
 
 imf_dataset <- function(database_id, parameters, start_year, end_year,
                      return_raw = FALSE, print_url = FALSE, times = 3,
+                     include_metadata = FALSE,
                      accounting_entry, activity, adjustment, age,
                      classification, cofog_function, commodity, comp_method,
                      composite_breakdown, counterpart_area, counterpart_sector,
@@ -392,7 +398,12 @@ imf_dataset will attempt to request the entire database.",immediate.=T)
         stop("No data found for that combination of parameters. Try making your request less restrictive.",call.=F)
     }
     if(return_raw == T){
-        return(raw_dl)
+        if(include_metadata == T){
+            metadata <- suppressWarnings(imf_metadata(URL = URL))
+            return(list(metadata,df))
+        }else{
+            return(raw_dl)
+        }
     }
     raw_dl_names <- names(raw_dl[1:(length(raw_dl)-1)])
     if(S3Class(raw_dl$Obs) == "list"){
@@ -435,5 +446,11 @@ imf_dataset will attempt to request the entire database.",immediate.=T)
         names(tmp) <- tolower(gsub("@","",raw_dl_names))
         df <- bind_cols(df,tmp)
     }
-    return(df)
+    if(include_metadata==FALSE){
+        return(df)
+    }else{
+        metadata <- suppressWarnings(imf_metadata(URL = URL))
+        return(list(metadata,df))
+    }
+
 }

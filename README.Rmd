@@ -167,6 +167,47 @@ df <- imf_dataset(database_id = commodity_db$database_id,
 kable(head(df))
 ```
 
+### Working with the Returned Data Frame
+
+Note that all columns in the returned data frame are character vectors, and that to plot the series we will need to convert to valid numeric or date formats:
+
+```{r plot}
+#Coerce date and value columns to plottable formats and create a simple plot
+df %>%
+    mutate(date = as.Date(paste0(date,"-01-01")),
+           value = as.numeric(value)) %>%
+    ggplot(aes(x=date,y=value,color=commodity)) +
+    geom_line()
+```
+
+Also note that the returned data frame has mysterious-looking codes as values in some columns.
+
+Codes in the `time_format` column are [ISO 8601 duration codes](https://en.m.wikipedia.org/wiki/ISO_8601#Durations). In this case, "P1Y" means "periods of 1 year." The `unit_mult` column represents the number of zeroes you should add to the `value` column. For instance, if `value` is in millions, then the unit multiplier will be 6. If in billions, then the unit multiplier will be 9.
+
+The meanings of the other codes are stored in our `params` object and can be fetched with a join. For instance to fetch the meaning of the ref_area code "W00", we can perform a left join with the `params$ref_area` data frame and use `select` to replace ref_area with the parameter description:
+
+```{r example_join}
+# Join df with params$ref_area to fetch code description
+df <- left_join(df,params$ref_area,by=c("ref_area"="input_code")) %>%
+    select(date, value, freq, ref_area = description, commodity, unit_measure, unit_mult, time_format)
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+Alternatively, we can simply replace the code in our data series with the corresponding description in `params`. Here, we replace each `unit_measure` code with the corresponding description in `params$unit_measure`:
+
+```{r example_join_2}
+# Replace each unique unit_measure code in df with corresponding description
+# in params$unit_measure
+for(code in unique(df$unit_measure)){
+    df$unit_measure[df$unit_measure == code] <- params$unit_measure$description[params$unit_measure$input_code == code]
+}
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
 ### View the imfr Vignettes Demonstrating the Two Workflows
 
 See also the vignettes, which can be accessed with `vignette("ParametersList")` and `vignette("ParametersVectors")`.
@@ -178,4 +219,3 @@ Planned features for future versions:
 * Add a workaround to support "All" codes that are listed as valid input codes in the IMF parameters lists but don't actually work when used in API requests
 * Determine maximum length of a request URL, and split into multiple requests if the URL is too long
 * Submit to CRAN
-* Call to `http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%database_id%` in `imf_parameters` to get all parameter names and values with a single API call (and thus reduce the need for throttling to avoid hitting the API rate limit.)
