@@ -56,16 +56,6 @@ installed, load these packages using the `library` function:
 # Load libraries
 library(imfr)
 library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.0     ✔ readr     2.1.4
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.0
-#> ✔ ggplot2   3.4.1     ✔ tibble    3.2.0
-#> ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-#> ✔ purrr     1.0.1     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors
 library(stringr)
 library(knitr)
 ```
@@ -131,8 +121,6 @@ valid input codes for a given database:
 ``` r
 # Fetch list of valid parameters and input codes for commodity price database
 params <- imf_parameters(commodity_db$database_id)
-#> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-#> Request failed [ERROR]. Retrying in 4.3 seconds...
 ```
 
 The `imf_parameters` function returns a named list of data frames. Each
@@ -213,6 +201,8 @@ df <- imf_dataset(database_id = commodity_db$database_id,
          freq = selected_freq, commodity = selected_commodity,
          unit_measure = selected_unit_measure,
          start_year = 2000, end_year = 2015)
+#> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
+#> Request failed [ERROR]. Retrying in 4.1 seconds...
 
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
@@ -250,8 +240,6 @@ params$unit_measure <- params$unit_measure %>%
 df <- imf_dataset(database_id = commodity_db$database_id,
                parameters = params,
          start_year = 2000, end_year = 2015)
-#> Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-#> Request failed [ERROR]. Retrying in 3.3 seconds...
 
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))

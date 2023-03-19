@@ -42,7 +42,7 @@ devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)'
 
 We recommend using `imfr` in combination with the `tidyverse`, `stringr`, and `knitr` libraries, which introduce a powerful set of functions for viewing and manipulating the data types returned by `imfr` functions. Each of these packages can be installed from the CRAN repository using the `install.packages` function. Once they are installed, load these packages using the `library` function:
 
-```{r load_libraries}
+```{r load_libraries, message=FALSE}
 # Load libraries
 library(imfr)
 library(tidyverse)
