@@ -216,7 +216,7 @@ df <- imf_dataset(database_id = commodity_db$database_id,
 ```
 
     ## Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-    ## Request failed [ERROR]. Retrying in 1 seconds...
+    ## Request failed [ERROR]. Retrying in 3.5 seconds...
 
 ``` r
 # Display the first few entries in the retrieved data frame using knitr::kable
@@ -274,17 +274,6 @@ kable(head(df))
 Note that all columns in the returned data frame are character vectors,
 and that to plot the series we will need to convert to valid numeric or
 date formats:
-
-``` r
-#Coerce date and value columns to plottable formats and create a simple plot
-df %>%
-    mutate(date = as.Date(paste0(date,"-01-01")),
-           value = as.numeric(value)) %>%
-    ggplot(aes(x=date,y=value,color=commodity)) +
-    geom_line()
-```
-
-![](README_files/figure-gfm/plot-1.png)<!-- -->
 
 Also note that the returned data frame has mysterious-looking codes as
 values in some columns.

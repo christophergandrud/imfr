@@ -187,7 +187,7 @@ kable(head(df))
 
 Note that all columns in the returned data frame are character vectors, and that to plot the series we will need to convert to valid numeric or date formats:
 
-```{r plot}
+```{r plot, include=FALSE}
 #Coerce date and value columns to plottable formats and create a simple plot
 df %>%
     mutate(date = as.Date(paste0(date,"-01-01")),
