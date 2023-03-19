@@ -57,7 +57,7 @@ library(knitr)
 
 The `imfr` package introduces four core functions: `imf_databases`, `imf_parameters`, `imf_parameter_defs`, and `imf_dataset`. The function for downloading datasets is `imf_dataset`, but you will need the other functions to determine what arguments to supply to `imf_dataset`. For instance, all calls to `imf_dataset` require a `database_id`. This is because the IMF serves many different databases through its API, and the API needs to know which of these many databases you're requesting data from. To obtain a list of databases, use `imf_databases`, like so:
 
-```{r imf_databases}
+```{r imf_databases, messages=F}
 #Fetch the list of databases available through the IMF API
 databases <- imf_databases()
 ```
@@ -70,7 +70,7 @@ unique_params <- c('freq', 'ref_area', 'indicator', 'counterpart_area', 'ref_sec
 num_params <- length(unique_params)
 ```
 
-```{r count_invalid_dbs, echo=FALSE, include=FALSE, eval=FALSE}
+```{r count_invalid_dbs, echo=FALSE, include=FALSE, eval=FALSE, messages=FALSE}
 #Try to call each imf_database, and count the number that are invalid
 parameter_defs <- map_dfr(databases$database_id,function(x){
     tryCatch({imf_parameter_defs(x)},error=function(cond){return(data.frame(parameter = NA, description = NA))}) %>%
@@ -103,7 +103,7 @@ Once you have a database_id, it's possible to make a call to `imf_dataset` to fe
 
 Requests to databases available through the IMF API are complicated by the fact that each database uses a different set of parameters when making a request. (At last count, there were `r num_params` unique parameters used in making API requests from the various databases!) You also have to have the list of valid input codes for each parameter. The `imf_parameters` function solves this problem. Use the function to obtain the full list of parameters and valid input codes for a given database:
 
-```{r imf_parameters}
+```{r imf_parameters,messages=F}
 # Fetch list of valid parameters and input codes for commodity price database
 params <- imf_parameters(commodity_db$database_id)
 ```
@@ -120,7 +120,7 @@ names(params)
 
 In the event that a parameter name is not self-explanatory, the `imf_parameter_defs` function can be used to fetch short text descriptions of each parameter:
 
-```{r parameter_defs}
+```{r parameter_defs, messages=F}
 # Fetch and display parameter text descriptions for the commodity price database
 param_descriptions <- imf_parameter_defs(commodity_db$database_id)
 kable(param_descriptions)
