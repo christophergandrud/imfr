@@ -8,7 +8,7 @@
 #' @noRd
 
 download_parse <- limit_rate(function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 3) %>%
+    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 2) %>%
         content(as='text',econding='UTF-8')
 
     if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {

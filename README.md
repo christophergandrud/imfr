@@ -10,18 +10,12 @@ Version](http://www.r-pkg.org/badges/version/imfr)](https://cran.r-project.org/p
 Downloads](http://cranlogs.r-pkg.org/badges/last-month/imfr) ![CRAN
 Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/imfr)
 
-R package for interacting with the [International Monetary
-Funds’s](http://data.imf.org/) [RESTful JSON
-API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service).
-
 # imfr
 
-You can use the `imf_data` function to download the data the IMF makes
-available via its API. To do this you will need at least the following
-information:
-
 Originally created by Christopher Gandrud, imfr is an R package for
-downloading data from the International Monetary Fund API endpoint.
+downloading data from the [International Monetary
+Funds’s](http://data.imf.org/) [RESTful JSON
+API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service).
 Version 2, by Christopher C. Smith, is an extensive revision of the
 package to make it both more powerful and more user-friendly. Version 2
 is backward-compatible with Version 1, but most of the functions from
@@ -91,8 +85,9 @@ databases <- imf_databases()
 ```
 
 This function returns the IMF’s listing of 259 databases available
-through the API. (In reality, many of the listed databases are defunct
-and not actually available.)
+through the API. (In reality, 7 of the listed databases are defunct and
+not actually available: FAS_2015, GFS01, FM202010, APDREO202010,
+AFRREO202010, WHDREO202010, BOPAGG_2020.)
 
 To view and explore the database list, it’s possible to open a viewing
 pane with `View(databases)` or to create an attractive table with
@@ -126,10 +121,12 @@ to reduce the size of your request.
 
 Requests to databases available through the IMF API are complicated by
 the fact that each database uses a different set of parameters when
-making a request. You also have to have the list of valid input codes
-for each parameter. The `imf_parameters` function solves this problem.
-Use the function to obtain the full list of parameters and valid input
-codes for a given database:
+making a request. (At last count, there were 43 unique parameters used
+in making API requests from the various databases!) You also have to
+have the list of valid input codes for each parameter. The
+`imf_parameters` function solves this problem. Use the function to
+obtain the full list of parameters and valid input codes for a given
+database:
 
 ``` r
 # Fetch list of valid parameters and input codes for commodity price database
@@ -218,12 +215,7 @@ df <- imf_dataset(database_id = commodity_db$database_id,
          freq = selected_freq, commodity = selected_commodity,
          unit_measure = selected_unit_measure,
          start_year = 2000, end_year = 2015)
-```
 
-    ## Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-    ## Request failed [ERROR]. Retrying in 4.4 seconds...
-
-``` r
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
 ```
@@ -349,11 +341,6 @@ kable(head(df))
 | 2003 | 43.2878876950788 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
 | 2004 | 82.9185858052862 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
 | 2005 | 71.9223526096731 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
-
-### View the imfr Vignettes Demonstrating the Two Workflows
-
-See also the vignettes, which can be accessed with
-`vignette("ParametersList")` and `vignette("ParametersVectors")`.
 
 ## Development Notes
 
