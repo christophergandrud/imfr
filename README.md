@@ -213,12 +213,7 @@ df <- imf_dataset(database_id = commodity_db$database_id,
          freq = selected_freq, commodity = selected_commodity,
          unit_measure = selected_unit_measure,
          start_year = 2000, end_year = 2015)
-```
 
-    ## Error in curl::curl_fetch_memory(url, handle = handle): Failure when receiving data from the peer
-    ## Request failed [ERROR]. Retrying in 3.5 seconds...
-
-``` r
 # Display the first few entries in the retrieved data frame using knitr::kable
 kable(head(df))
 ```
