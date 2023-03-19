@@ -130,7 +130,7 @@ any other arguments will be ignored (and a warning thrown).
 # Retrieve "Current Account, Goods and Services, Services, Travel, Personal,
 # Other, Credit, US Dollars" for "United States" from the Balance of Payments
 # database using the character vector method
-df <- imf_dataset(database_id = 'BOP',ref_area = 'US',
-                  indicator = 'BXSTVPO_BP6_USD')
+df <- imf_dataset(database_id = 'BOP',freq='A',ref_area = 'US',
+                  indicator = 'BXSTVPO_BP6_USD',start_year=2020)
 
 }

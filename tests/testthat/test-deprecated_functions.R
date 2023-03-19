@@ -6,8 +6,8 @@ test_that("imf_ids works", {
 })
 
 test_that("imf_codelist works", {
-    expect_warning(df <- imf_codelist("BOP"),"(.*deprecated.*)")
-    expect_warning(li <- imf_codelist("BOP",return_raw=T),"(.*deprecated.*)")
+    expect_warning(df <- imf_codelist("PCPS"),"(.*deprecated.*)")
+    expect_warning(li <- imf_codelist("PCPS",return_raw=T),"(.*deprecated.*)")
     expect_equal(all(names(df) %in% c("codelist","description")), TRUE)
     expect_equal(nrow(df) > 1, TRUE)
     expect_equal(S3Class(li) == "list", TRUE)
@@ -37,8 +37,8 @@ test_that("imf_data works", {
 })
 
 test_that("imf_metastructure works", {
-    expect_warning(df <- imf_metastructure("BOP"),"(.*deprecated.*)")
-    expect_warning(raw_data <- imf_metastructure("BOP",return_raw=T),"(.*deprecated.*)")
+    expect_warning(df <- imf_metastructure("PCPS"),"(.*deprecated.*)")
+    expect_warning(raw_data <- imf_metastructure("PCPS",return_raw=T),"(.*deprecated.*)")
     expect_equal(nrow(df) == 1 & ncol(df) == 2, TRUE)
     expect_equal(all(names(df) %in% c("codelist","description")), TRUE)
     expect_equal(!any(is.na(df)), TRUE)

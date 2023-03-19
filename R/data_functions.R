@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' # Return first 6 IMF database IDs and descriptions
-#' head(imf_databases())
+#' databases <- imf_databases()
 #'
 #' @export
 
@@ -51,13 +51,9 @@ imf_databases <- function(times = 3) {
 #' descriptions of what each input code represents.
 #'
 #' @examples
-#' # Fetch the full list of indicator codes and descriptions for the Balance of
-#' # Payments database
-#' params <- imf_parameters(database_id = 'BOP')
-#' # Print names of parameters in the list
-#' names(params)
-#' # Display data frame of all possible inputs for the frequency parameter
-#' params$freq
+#' # Fetch the full list of indicator codes and descriptions for the Primary
+#' # Commodity Price System database
+#' params <- imf_parameters(database_id = 'PCPS')
 #'
 #' @importFrom dplyr %>%
 #' @importFrom purrr map map_dfr
@@ -114,8 +110,8 @@ imf_parameters <- function(database_id, times = 3) {
 #'
 #' @examples
 #' # Get names and text descriptions of parameters used in IMF API calls to the
-#' # Balance of Payments database
-#' imf_parameter_defs(database_id = 'BOP')
+#' # Primary Commodity Price System database
+#' param_defs <- imf_parameter_defs(database_id = 'PCPS')
 #'
 #' @importFrom dplyr %>% select
 #' @importFrom purrr map
@@ -197,8 +193,8 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
 #' # Retrieve "Current Account, Goods and Services, Services, Travel, Personal,
 #' # Other, Credit, US Dollars" for "United States" from the Balance of Payments
 #' # database using the character vector method
-#' df <- imf_dataset(database_id = 'BOP',ref_area = 'US',
-#'                   indicator = 'BXSTVPO_BP6_USD')
+#' df <- imf_dataset(database_id = 'BOP',freq='A',ref_area = 'US',
+#'                   indicator = 'BXSTVPO_BP6_USD',start_year=2020)
 #'
 #' @importFrom dplyr %>% filter bind_cols select
 #' @importFrom purrr map walk

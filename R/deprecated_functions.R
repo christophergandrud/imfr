@@ -9,7 +9,7 @@
 #' dataflow list is returned.
 #'
 #' @examples
-#' suppressWarnings(head(imf_ids()))
+#' suppressWarnings(databases <- imf_ids())
 #'
 #' @rdname imfr-deprecated
 #' @section \code{imf_ids}:
@@ -46,7 +46,7 @@ imf_ids <- function(return_raw = FALSE, times = 3) {
 #'
 #' @examples
 #' #' # Find Primary Commodity Price System database data structure
-#' suppressWarnings(imf_codelist(database_id = 'PCPS'))
+#' suppressWarnings(cl <- imf_codelist(database_id = 'PCPS'))
 #'
 #' @importFrom dplyr %>% left_join
 #'
@@ -93,7 +93,7 @@ imf_codelist <- function(database_id, return_raw = FALSE, times = 3) {
 #'
 #' @examples
 #' # Retrieve indicators from BOP database
-#' suppressWarnings(imf_codes(codelist = 'CL_INDICATOR_BOP'))
+#' suppressWarnings(codes <- imf_codes(codelist = 'CL_INDICATOR_BOP'))
 #'
 #' @rdname imfr-deprecated
 #' @section \code{imf_codes}:
@@ -150,10 +150,10 @@ imf_codes <- function(codelist, return_raw = FALSE, times = 3) {
 #' series.
 #'
 #' @examples
-#' # Download Real Effective Exchange Rate (CPI base) for the UK and China
-#' # at an annual frequency
-#' suppressWarnings(imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-#'                country = c('CN', 'GB'), freq = 'A'))
+#' # Download Real Effective Exchange Rate (CPI base) for China at an annual
+#' # frequency since 2018
+#' suppressWarnings(df <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
+#'                  country = 'CN', freq = 'A',start = 2018))
 #'
 #' @importFrom dplyr %>% arrange bind_cols
 #' @importFrom tidyr spread
@@ -237,7 +237,7 @@ imf_data <- function(database_id, indicator, country = 'all',
 #'
 #' @examples
 #' # Find Primary Commodity Price System database data structure
-#' suppressWarnings(imf_metastructure(database_id = 'PCPS'))
+#' suppressWarnings(metastruc <- imf_metastructure(database_id = 'PCPS'))
 #'
 #' @rdname imfr-deprecated
 #' @section \code{imf_metastructure}:
@@ -278,7 +278,7 @@ imf_metastructure <- function(database_id, return_raw = FALSE, times = 3) {
 #'
 #' @examples
 #' # Find Primary Commodity Price System database metadata
-#' suppressWarnings(imf_metadata(database_id = 'PCPS'))
+#' suppressWarnings(metadata <- imf_metadata(database_id = 'PCPS'))
 #'
 #' @rdname imfr-deprecated
 #' @section \code{imf_metadata}:
@@ -295,7 +295,7 @@ imf_metadata <- function(database_id, URL, times = 3, ...)
              call. = FALSE)
     }
     if(missing(URL)){
-        URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%s',
+        URL <- sprintf('http://dataservices.imf.org/REST/SDMX_JSON.svc/GenericMetadata/%s/A..?start_year=2020',
                        database_id)
     }else{
         URL <- sub("CompactData","GenericMetadata",URL)

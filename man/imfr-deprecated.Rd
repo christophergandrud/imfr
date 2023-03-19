@@ -127,24 +127,24 @@ future version. Use \code{imf_dataset(include_metadata = TRUE)} instead.
 }
 
 \examples{
-suppressWarnings(head(imf_ids()))
+suppressWarnings(databases <- imf_ids())
 
 #' # Find Primary Commodity Price System database data structure
-suppressWarnings(imf_codelist(database_id = 'PCPS'))
+suppressWarnings(cl <- imf_codelist(database_id = 'PCPS'))
 
 # Retrieve indicators from BOP database
-suppressWarnings(imf_codes(codelist = 'CL_INDICATOR_BOP'))
+suppressWarnings(codes <- imf_codes(codelist = 'CL_INDICATOR_BOP'))
 
-# Download Real Effective Exchange Rate (CPI base) for the UK and China
-# at an annual frequency
-suppressWarnings(imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-               country = c('CN', 'GB'), freq = 'A'))
+# Download Real Effective Exchange Rate (CPI base) for China at an annual
+# frequency since 2018
+suppressWarnings(df <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
+                 country = 'CN', freq = 'A',start = 2018))
 
 # Find Primary Commodity Price System database data structure
-suppressWarnings(imf_metastructure(database_id = 'PCPS'))
+suppressWarnings(metastruc <- imf_metastructure(database_id = 'PCPS'))
 
 # Find Primary Commodity Price System database metadata
-suppressWarnings(imf_metadata(database_id = 'PCPS'))
+suppressWarnings(metadata <- imf_metadata(database_id = 'PCPS'))
 
 }
 \keyword{internal}

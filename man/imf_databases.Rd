@@ -18,6 +18,6 @@ List IMF database IDs and descriptions
 }
 \examples{
 # Return first 6 IMF database IDs and descriptions
-head(imf_databases())
+databases <- imf_databases()
 
 }

@@ -36,12 +36,8 @@ Alternatively, individually supply \code{input_code} values from each data
 frame as arguments to \code{imf_dataset}.
 }
 \examples{
-# Fetch the full list of indicator codes and descriptions for the Balance of
-# Payments database
-params <- imf_parameters(database_id = 'BOP')
-# Print names of parameters in the list
-names(params)
-# Display data frame of all possible inputs for the frequency parameter
-params$freq
+# Fetch the full list of indicator codes and descriptions for the Primary
+# Commodity Price System database
+params <- imf_parameters(database_id = 'PCPS')
 
 }
