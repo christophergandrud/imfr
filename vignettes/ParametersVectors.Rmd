@@ -1,0 +1,134 @@
+---
+title: "ParametersVectors"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ParametersVectors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Downloading Commodity Price Data with imfr Using Input Code Vectors
+
+Say you want to fetch a series of precious metal prices from the International Monetary Fund API endpoint using the `imfr` library. There are two ways to accomplish this with the `imf_dataset` function: by supplying a parameters list object or by supplying input code vectors. In this vignette, we will use the second method. 
+
+First, we load the `imfr` library. We will also use `dplyr`, `stringr`, `ggplot2`, and `knitr`.
+
+```{r setup, include=FALSE}
+library(imfr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(knitr)
+```
+
+## Finding the Commodity Price database_id Using imf_databases
+
+There are just four core `imfr` functions. First we'll need to use `imf_databases` to get the database code for commodities prices.
+
+```{r imf_databases}
+databases <- imf_databases()
+head(databases) %>% kable()
+```
+
+This data frame contains a `database_id` column and a `description` column, with `r nrow(databases)` rows. Each row represents a database listed as available through the IMF API. To locate the commodities price database, we will search the description column using `str_detect` from the `stringr` package:
+
+```{r find_commodities}
+commodity_db <- databases[str_detect(tolower(databases$description),"commodity price"),]
+commodity_db %>% kable()
+```
+
+## Finding Parameters and Valid Input Codes for API Requests using imf_parameters
+
+Next we need to get a list of parameters and valid input codes for our API request. For this, we need to feed our database ID into the `imf_parameters` function:
+
+```{r imf_parameters}
+params <- imf_parameters(commodity_db$database_id)
+```
+
+Investigating the returned object, we see that it is a named list of data frames, and that each data frame has two columns, named `input_code` and `description`:
+
+```{r investigate_params}
+class(params)
+names(params)
+head(params[[1]]) %>% kable()
+```
+
+In case the parameter names are not self-explanatory, we can get additional detail on what each parameter represents by calling the `imf_parameter_defs` function:
+
+```{r imf_parameter_defs}
+imf_parameter_defs(commodity_db$database_id) %>% kable()
+```
+
+## Modifying a Parameters List and Supplying It to imf_dataset
+
+Let's say we want the global gold and silver prices at annual frequency. To make our API request, we will filter each data frame in our `params` list object, and then we will feed the modified list object into the `imf_dataset` function.
+
+First, we search the frequency data frame using `str_detect` to fetch the input code for "Annual" frequency:
+
+```{r find_annual}
+selected_freq <- params$freq$input_code[str_detect(tolower(params$freq$description),"annual")]
+selected_freq
+```
+
+There is only one geographical area code in the geographical areas data frame, so we won't bother supplying a code to `imf_dataset` for this parameter. (If you don't supply a code for a given parameter, `imf_dataset` will attempt to return all values for that parameter.)
+
+```{r find_global}
+params$ref_area  %>% kable()
+```
+
+Next we search the commodity indicator data frame for "gold" and "silver":
+
+```{r find_gold_silver}
+params$commodity[str_detect(tolower(params$commodity$description),"gold") |
+                 str_detect(tolower(params$commodity$description),"silver"),] %>% kable()
+```
+
+The first two results aren't what we want, so we fetch only the third and fourth input codes:
+
+```{r further_filter}
+selected_commodities <- params$commodity$input_code[str_detect(tolower(params$commodity$description),"gold") | str_detect(tolower(params$commodity$description),"silver")][c(3,4)]
+selected_commodities
+```
+
+Next, we see what unit prices are available. Note that although "All_Units" and "USD" are listed here as valid request codes, these codes do not actually appear in the database, so attempting to use them in a request will return no results. The IMF API is full of unfortunate wrinkles like this, which you can only discover through trial and error.
+
+```{r see_units}
+params$unit_measure %>% kable()
+```
+
+For our purposes, the index will do just fine:
+
+```{r find_index}
+selected_unit_measure <- params$unit_measure$input_code[str_detect(tolower(params$unit_measure$description),"index")]
+selected_unit_measure
+```
+
+Finally, we can feed our input code vectors to the `imf_dataset` data function as its `freq`, `commodity`, and `unit_measure` arguments. For illustration purposes, we will only request data for the years from 1995 to 2010.
+
+```{r imf_dataset}
+df <- imf_dataset(database_id = commodity_db$database_id,
+               freq = selected_freq,
+               commodity = selected_commodities,
+               unit_measure = selected_unit_measure,
+               start_year=1995,end_year=2010)
+```
+
+## Working with the Returned Data Frame
+
+Note that all columns in the returned data frame are character vectors, and that to plot the series we will need to convert to valid numeric or date formats:
+
+```{r plot}
+df %>%
+    mutate(date = as.numeric(date),
+           value = as.numeric(value)) %>%
+    ggplot(aes(x=date,y=value,color=commodity)) +
+    geom_line()
+```
+
+Congratulations on your first successful IMF API request using input code vectors!

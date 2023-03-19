@@ -4,3 +4,9 @@
 .RData
 .Ruserdata
 README.html
+inst/doc
+/doc/
+docs/
+/Meta/
+/R/experimental.R
+README_files/

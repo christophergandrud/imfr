@@ -1,7 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-.Rmd$
-.html$
 .travis.yml
 data/all_iso.csv
+^doc$
+^Meta$
+^README\.Rmd$
+
 ^\.github$

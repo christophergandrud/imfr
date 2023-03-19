@@ -1,4 +1,12 @@
-# All updates will be detailed here
+# Updates
+
+## Version 0.2.0.0
+
+- Major update! Fixes broken functionality, introduces several new functions.
+
+- Deprecates or removes most package functions from Version 0.1.9.1.
+
+- Adds detailed project documentation, including two vignettes.
 
 ## Version 0.1.9.2
 
@@ -59,7 +67,7 @@ default `end` year. Thanks to Jay Ulfelder for inspiration.
 
 - Minor documentation typo fix.
 
-## Version 0.1.1
+## Version 0.1.1
 
 - Updated URL GET request schema to meet changes introduced by the IMF on
 2016-07-27. These changes had broke `imf_data`, but the issue is now resolved.
