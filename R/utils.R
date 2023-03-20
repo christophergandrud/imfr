@@ -8,30 +8,31 @@
 #' @noRd
 
 download_parse <- limit_rate(function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 2) %>%
-        content(as='text',econding='UTF-8')
+    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 2)
+    cont <- raw_download %>% content(as='text',econding='UTF-8')
+    status <- raw_download$status_code
 
-    if (grepl('<!DOCTYPE html PUBLIC', raw_download)) {
+    if (grepl('<!DOCTYPE html PUBLIC', cont)) {
         stop(sprintf("data.imf.org appears to be down. URL: %s, Status: %s, Content: %s",
-                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
+                     URL, status, substr(cont, 1, 200)), call. = FALSE)
     }
 
-    if (grepl('<!DOCTYPE HTML PUBLIC', raw_download)) {
+    if (grepl('<!DOCTYPE HTML PUBLIC', cont)) {
         stop(sprintf("Unable to download series. URL: %s, Status: %s, Content: %s",
-                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
+                     URL, status, substr(cont, 1, 200)), call. = FALSE)
     }
 
-    if (grepl('<!DOCTYPE html>', raw_download)) {
+    if (grepl('<!DOCTYPE html>', cont)) {
         stop(sprintf("Unable to download series. URL: %s, Status: %s, Content: %s",
-                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
+                     URL, status, substr(cont, 1, 200)), call. = FALSE)
     }
 
-    if (grepl('<string xmlns="http://schemas.m', raw_download)) {
+    if (grepl('<string xmlns="http://schemas.m', cont)) {
         stop(sprintf("Unable to find what you're looking for. URL: %s, Status: %s, Content: %s",
-                     URL, raw_download$status_code, substr(raw_download, 1, 100)), call. = FALSE)
+                     URL, status, substr(cont, 1, 200)), call. = FALSE)
     }
 
-    json_parsed <- fromJSON(raw_download)
+    json_parsed <- fromJSON(cont)
     return(json_parsed)
 }, rate(n = 8, period = 5))
 
