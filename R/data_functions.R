@@ -68,11 +68,11 @@ imf_parameters <- function(database_id, times = 3) {
 
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
     tryCatch({codelist <- imf_dimensions(database_id,times)}, error = function(e) {
-        if(e$message == "Unable to find what you're looking for."){
-            stop(paste(e$message,'Did you supply a valid database_id? Use imf_databases to find.'),
+        if(grepl('<string xmlns=',e$message)){
+            stop(paste0(e$message,'\n\nDid you supply a valid database_id? Use imf_databases to find.'),
                  call. = FALSE)
         }else{
-            stop(e,
+            stop(e$message,
                  call. = FALSE)
         }
     })

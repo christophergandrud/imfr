@@ -8,28 +8,18 @@
 #' @noRd
 
 download_parse <- limit_rate(function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 2)
-    cont <- raw_download %>% content(as='text',econding='UTF-8')
+    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 2) %>%
+        suppressWarnings()
+    cont <- raw_download %>% content(as='text',encoding='UTF-8')
     status <- raw_download$status_code
+    header <- raw_download$request$headers[[1]]
+    err_message <- paste0("API request failed. URL: '",URL,"', Status: '",status,
+                          "', Content: '",substr(cont, 1, 30)," ... ', Request Header: '",header,"'")
 
-    if (grepl('<!DOCTYPE html PUBLIC', cont)) {
-        stop(sprintf("data.imf.org appears to be down. URL: %s, Status: %s, Content: %s",
-                     URL, status, substr(cont, 1, 200)), call. = FALSE)
-    }
-
-    if (grepl('<!DOCTYPE HTML PUBLIC', cont)) {
-        stop(sprintf("Unable to download series. URL: %s, Status: %s, Content: %s",
-                     URL, status, substr(cont, 1, 200)), call. = FALSE)
-    }
-
-    if (grepl('<!DOCTYPE html>', cont)) {
-        stop(sprintf("Unable to download series. URL: %s, Status: %s, Content: %s",
-                     URL, status, substr(cont, 1, 200)), call. = FALSE)
-    }
-
-    if (grepl('<string xmlns="http://schemas.m', cont)) {
-        stop(sprintf("Unable to find what you're looking for. URL: %s, Status: %s, Content: %s",
-                     URL, status, substr(cont, 1, 200)), call. = FALSE)
+    if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
+        grepl('<!DOCTYPE html', cont) |
+        grepl('<string xmlns="http://schemas.m', cont)) {
+        stop(err_message)
     }
 
     json_parsed <- fromJSON(cont)

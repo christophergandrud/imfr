@@ -11,8 +11,8 @@ test_that("imf_parameters works", {
 
 test_that("imf_parameter_defs works",{
     expect_equal(nrow(imf_parameter_defs("BOP_2017M08")) > 1, TRUE)
-    expect_error(imf_parameter_defs(times=1),"Must supply database_id.\nUse imf_databases to find.",fixed=T)
-    expect_error(imf_parameters("not_a_real_database",times=1))
+    expect_error(imf_parameter_defs(times=1),"database_id")
+    expect_error(imf_parameters("not_a_real_database",times=1),"database_id")
 })
 
 test_that("imf_dataset error handling works",{
