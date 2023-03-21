@@ -14,7 +14,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
     status <- raw_download$status_code
     header <- raw_download$request$headers[[1]]
     err_message <- paste0("API request failed. URL: '",URL,"', Status: '",status,
-                          "', Content: '",substr(cont, 1, 30)," ... ', Request Header: '",header,"'")
+                          "', Content: '",substr(cont, 1, 30)," ... ")
 
     if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
         grepl('<!DOCTYPE html', cont) |
