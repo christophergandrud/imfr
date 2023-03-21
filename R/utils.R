@@ -14,7 +14,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
     status <- raw_download$status_code
     header <- raw_download$request$headers[[1]]
     err_message <- paste0("API request failed. URL: '",URL,"', Status: '",status,
-                          "', Content: '",substr(cont, 1, 150)," ... ', Request Header: '",header,"'")
+                          "', Content: '",substr(cont, 1, 150)," ... ")
 
     if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
         grepl('<!DOCTYPE html', cont) |
@@ -24,7 +24,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
 
     json_parsed <- fromJSON(cont)
     return(json_parsed)
-}, rate(n = 8, period = 5))
+}, rate(n = 5, period = 5))
 
 #' Retrieve the list of codes for dimensions of an individual IMF database.
 #'
