@@ -1,6 +1,6 @@
 #' Simplify downloading and parsing JSON content
 #'
-#' @importFrom httr RETRY progress user_agent content
+#' @importFrom httr RETRY progress content add_headers
 #' @importFrom jsonlite fromJSON
 #' @importFrom dplyr %>%
 #' @importFrom ratelimitr limit_rate rate
