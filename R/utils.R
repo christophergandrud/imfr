@@ -8,13 +8,13 @@
 #' @noRd
 
 download_parse <- limit_rate(function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, user_agent(''), times = times, pause_base = 2) %>%
+    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"),times = times, pause_base = 2) %>%
         suppressWarnings()
     cont <- raw_download %>% content(as='text',encoding='UTF-8')
     status <- raw_download$status_code
     header <- raw_download$request$headers[[1]]
     err_message <- paste0("API request failed. URL: '",URL,"', Status: '",status,
-                          "', Content: '",substr(cont, 1, 30)," ... ")
+                          "', Content: '",substr(cont, 1, 30))
 
     if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
         grepl('<!DOCTYPE html', cont) |
