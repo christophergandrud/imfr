@@ -18,7 +18,8 @@ download_parse <- limit_rate(function(URL, times = 3) {
 
     if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
         grepl('<!DOCTYPE html', cont) |
-        grepl('<string xmlns="http://schemas.m', cont)) {
+        grepl('<string xmlns="http://schemas.m', cont) |
+        grepl('<html xmlns=', cont)) {
         stop(err_message)
     }
 
