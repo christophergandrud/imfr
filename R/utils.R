@@ -1,6 +1,6 @@
 #' Simplify downloading and parsing JSON content
 #'
-#' @importFrom httr RETRY progress content add_headers
+#' @importFrom httr RETRY progress content user_agent add_headers
 #' @importFrom jsonlite fromJSON
 #' @importFrom dplyr %>%
 #' @importFrom ratelimitr limit_rate rate
@@ -8,7 +8,7 @@
 #' @noRd
 
 download_parse <- limit_rate(function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"),times = times, pause_base = 2) %>%
+    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"), user_agent("imfr"),times = times, pause_base = 2) %>%
         suppressWarnings()
     cont <- raw_download %>% content(as='text',encoding='UTF-8')
     status <- raw_download$status_code
@@ -25,7 +25,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
 
     json_parsed <- fromJSON(cont)
     return(json_parsed)
-}, rate(n = 4, period = 5))
+}, rate(n = 3, period = 5))
 
 #' Retrieve the list of codes for dimensions of an individual IMF database.
 #'
