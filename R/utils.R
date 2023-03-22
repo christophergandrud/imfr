@@ -25,7 +25,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
 
     json_parsed <- fromJSON(cont)
     return(json_parsed)
-}, rate(n = 5, period = 5))
+}, rate(n = 4, period = 5))
 
 #' Retrieve the list of codes for dimensions of an individual IMF database.
 #'
