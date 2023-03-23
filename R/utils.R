@@ -8,7 +8,16 @@
 #' @noRd
 
 download_parse <- limit_rate(function(URL, times = 3) {
-    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"), user_agent("imfr"),times = times, pause_base = 2) %>%
+    if (nzchar(Sys.getenv("IMF_APP_NAME"))) {
+        app_name <- Sys.getenv("IMF_APP_NAME")
+        if(nchar(app_name) > 255){
+            app_name <- substr(app_name, 1, 255)
+            }
+    } else {
+        app_name <- paste0("imfr/",packageVersion("imfr"))
+    }
+
+    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"), user_agent(app_name),times = times, pause_base = 2) %>%
         suppressWarnings()
     cont <- raw_download %>% content(as='text',encoding='UTF-8')
     status <- raw_download$status_code
@@ -25,7 +34,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
 
     json_parsed <- fromJSON(cont)
     return(json_parsed)
-}, rate(n = 3, period = 5))
+}, rate(n = 5, period = 5))
 
 #' Retrieve the list of codes for dimensions of an individual IMF database.
 #'

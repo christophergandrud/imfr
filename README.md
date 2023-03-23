@@ -66,6 +66,35 @@ library(stringr)
 library(knitr)
 ```
 
+### Setting a Unique Application Name with imf_app_name
+
+The `imf_app_name()` function allows users to set a custom application
+name to be used when making API calls to the IMF API. The IMF API has an
+application-based rate limit of 50 requests per second, with the
+application identified by the “user_agent” variable in the request
+header.
+
+This could prove problematic if the `imfr` library became too popular
+and too many users tried to make simultaneous API requests using the
+default app name. By setting a custom application name, users can avoid
+hitting rate limits and being blocked by the API. The `imf_app_name()`
+function sets the application name by changing the `IMF_APP_NAME`
+variable in the environment. If this variable doesn’t exist,
+`imf_app_name()` will create it.
+
+To set a custom application name, simply call the `imf_app_name()`
+function with your desired application name as an argument:
+
+``` r
+imf_app_name("my_custom_app_name")
+```
+
+The function will throw an error if the provided name is missing, NULL,
+NA, not a string, or longer than 255 characters. If the provided name is
+“imfr” (the default) or an empty string, the function will issue a
+warning recommending the use of a unique app name to avoid hitting rate
+limits.
+
 ### Fetching an Index of Databases with the imf_databases Function
 
 The `imfr` package introduces four core functions: `imf_databases`,
@@ -105,7 +134,7 @@ kable(commodity_db)
 
 |     | database_id | description                           |
 |:----|:------------|:--------------------------------------|
-| 245 | PCPS        | Primary Commodity Price System (PCPS) |
+| 242 | PCPS        | Primary Commodity Price System (PCPS) |
 
 ### Fetching a List of Parameters and Input Codes with imf_parameters and imf_parameter_defs
 

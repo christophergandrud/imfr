@@ -1,4 +1,5 @@
 test_that("imf_databases works", {
+    imf_app_name("imfr_data_functions_tester")
     expect_equal(nrow(imf_databases()) > 1, TRUE)
 })
 

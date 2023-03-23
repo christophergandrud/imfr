@@ -1,4 +1,5 @@
 test_that("imf_ids works", {
+    imf_app_name("imfr_deprecated_functions_tester")
     expect_warning(ids <- imf_ids(),"(.*deprecated.*)")
     expect_equal(nrow(ids) > 1, TRUE)
     expect_equal(ncol(ids) == 2, TRUE)
