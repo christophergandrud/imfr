@@ -1,25 +1,36 @@
 Package: imfr
 Type: Package
 Title: Download Data from the International Monetary Fund's Data API
-Version: 0.1.9.2
+Version: 0.2.0.0
 Description: Explore and download data from the International Monetary Fund's
     data API <http://data.imf.org/>.
-Date: 2023-02-26
+Date: 2023-03-19
 Authors@R: c(
     person("Christopher", "Gandrud", email = "christopher.gandrud@gmail.com",
-    role = c("aut", "cre"))
+    role = c("aut", "cre")),
+    person("Christopher", "Smith", email = "chriscarrollsmith@gmail.com",
+    role = c("aut"))
     )
-URL: https://CRAN.R-project.org/package=imfr
+URL: https://github.com/christophergandrud/imfr
 BugReports: https://github.com/christophergandrud/imfr/issues
 License: GPL (>= 3)
 Imports:
     dplyr,
     httr (>= 1.2.0),
-    jsonlite
+    jsonlite,
+    methods,
+    purrr,
+    ratelimitr,
+    tidyr
 LazyData: TRUE
 RoxygenNote: 7.2.3
 Suggests: 
-    testthat
+    knitr,
+    rmarkdown,
+    testthat,
+    tidyverse,
+    stringr
 Encoding: UTF-8
 Depends:
     R (>= 3.5.0)
+VignetteBuilder: knitr

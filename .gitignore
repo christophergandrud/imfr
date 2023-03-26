@@ -4,3 +4,8 @@
 .RData
 .Ruserdata
 README.html
+inst/doc
+/doc/
+docs/
+/Meta/
+README_files/

@@ -10,117 +10,361 @@ Version](http://www.r-pkg.org/badges/version/imfr)](https://cran.r-project.org/p
 Downloads](http://cranlogs.r-pkg.org/badges/last-month/imfr) ![CRAN
 Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/imfr)
 
-<!-- badges: end -->
-
-R package for interacting with the [International Monetary
+Originally created by Christopher Gandrud, imfr is an R package for
+downloading data from the [International Monetary
 Funds’s](http://data.imf.org/) [RESTful JSON
 API](http://datahelp.imf.org/knowledgebase/articles/667681-using-json-restful-web-service).
+Version 2, by Christopher C. Smith, is an extensive revision of the
+package to make it both more powerful and more user-friendly. Version 2
+is backward-compatible with Version 1, but most of the functions from
+Version 1 are deprecated and will raise warnings if you try to use them.
 
-# How to download IMF data
+## Why Version 2?
 
-You can use the `imf_data` function to download the data the IMF makes
-available via its API. To do this you will need at least the following
-information:
+The previous version of `imfr` allowed for specifying only three
+parameters—the same three for every database. This approach was
+sufficient to query some databases, but not others. As a result, the
+functionality of the package was limited, and many API requests failed.
 
-- `database_id`: the ID of the specific database you wish to download
-  the data series from. You can find the list of IDs and their
-  description using the `imf_ids` function.
+The previous version also served users a third-party list of ISO2
+country codes for use in requests rather than a database’s own internal
+list of valid input codes. This, too, resulted in the failure of many an
+API request.
 
-- `indicator`: the IMF indicators of the variables you want to download.
-  One way to find these is to:
+In addition to correcting these major problems, Version 2 also extends
+the functionality of the package to allow for both broader requests and
+more specific requests than were possible in Version 1. Users may now
+use a much larger set of filter parameters in making requests.
+Additionally, Version 2 tries to address the problem of
+user-friendliness by introducing more package documentation with
+suggested workflows and example vignettes.
 
-  1.  Use the `database_id` for the database you want to access with the
-      `imf_codelist` function to find the code list of the database.
+## Installation
 
-  2.  Then using the indicator code (usually `CL_INDICATOR_database_id`)
-      in `imf_codes`, you can find the data series indicator codes in
-      that database.
-
-  *Tip*: if you have a number of country identifiers that are not in
-  ISO2C format, you can use the helpful
-  [countrycode](https://cran.r-project.org/package=countrycode) package
-  to convert them.
-
-- `country`: one or more [ISO two letter country
-  codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) for the
-  countries you would like to download the data for. If
-  `country = 'all'` then all available countries will be downloaded.
-
-- `start` and `end`: the start and end years for which you would like to
-  download the data.
-
-- `freq`: the frequency of the series you want to download. Often series
-  are available annually, quarterly, and monthly.
-
-## Examples
-
-### Simple Country-Time-Variable
-
-Imagine that we want to download Effective Exchange Rate (CPI base) for
-China and the UK for 2013:
+To install the development version of `imfr`, use:
 
 ``` r
+devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)'
+```
+
+## Usage
+
+### Suggested packages
+
+We recommend using `imfr` in combination with the `tidyverse`,
+`stringr`, and `knitr` libraries, which introduce a powerful set of
+functions for viewing and manipulating the data types returned by `imfr`
+functions. Each of these packages can be installed from the CRAN
+repository using the `install.packages` function. Once they are
+installed, load these packages using the `library` function:
+
+``` r
+# Load libraries
 library(imfr)
-
-real_ex <- imf_data(database_id = 'IFS', indicator = 'EREER_IX',
-                    country = c('CN', 'GB'), freq = 'A',
-                    start = 2013, end = current_year())
+library(tidyverse)
+library(stringr)
+library(knitr)
 ```
+
+### Setting a Unique Application Name with imf_app_name
+
+The `imf_app_name()` function allows users to set a custom application
+name to be used when making API calls to the IMF API. The IMF API has an
+application-based rate limit of 50 requests per second, with the
+application identified by the “user_agent” variable in the request
+header.
+
+This could prove problematic if the `imfr` library became too popular
+and too many users tried to make simultaneous API requests using the
+default app name. By setting a custom application name, users can avoid
+hitting rate limits and being blocked by the API. The `imf_app_name()`
+function sets the application name by changing the `IMF_APP_NAME`
+variable in the environment. If this variable doesn’t exist,
+`imf_app_name()` will create it.
+
+To set a custom application name, simply call the `imf_app_name()`
+function with your desired application name as an argument:
 
 ``` r
-real_ex
+imf_app_name("my_custom_app_name")
 ```
 
-    ##    iso2c year  EREER_IX
-    ## 1     CN 2013 114.65614
-    ## 2     CN 2014 118.36130
-    ## 3     CN 2015 130.04824
-    ## 4     CN 2016 123.89490
-    ## 5     CN 2017 120.27383
-    ## 6     CN 2018 121.96143
-    ## 7     CN 2019 121.17874
-    ## 8     CN 2020 123.60422
-    ## 9     CN 2021 127.28147
-    ## 10    CN 2022 125.68274
-    ## 11    GB 2013 102.07692
-    ## 12    GB 2014 108.73324
-    ## 13    GB 2015 113.76298
-    ## 14    GB 2016 102.51068
-    ## 15    GB 2017  97.30308
-    ## 16    GB 2018  99.03746
-    ## 17    GB 2019  98.59743
-    ## 18    GB 2020  98.74350
-    ## 19    GB 2021 102.54819
-    ## 20    GB 2022 100.94407
+The function will throw an error if the provided name is missing, NULL,
+NA, not a string, or longer than 255 characters. If the provided name is
+“imfr” (the default) or an empty string, the function will issue a
+warning recommending the use of a unique app name to avoid hitting rate
+limits.
 
-### More complex data formats
+### Fetching an Index of Databases with the imf_databases Function
 
-While many quantities of interest from the IMF database are in simple
-country-time-variable format, many are not. For example, Direction of
-Trade Statistics include country-year-variable and a “counterpart area”.
-By default, `imf_data` would only return the first, but not the last.
-
-Because of the many possible data structures available from the imf,
-`imf_data` allows you to return the entire API call as a list. From this
-list you can then extract the requested data. To do this use the
-`return_raw = TRUE` argument, e.g.:
+The `imfr` package introduces four core functions: `imf_databases`,
+`imf_parameters`, `imf_parameter_defs`, and `imf_dataset`. The function
+for downloading datasets is `imf_dataset`, but you will need the other
+functions to determine what arguments to supply to `imf_dataset`. For
+instance, all calls to `imf_dataset` require a `database_id`. This is
+because the IMF serves many different databases through its API, and the
+API needs to know which of these many databases you’re requesting data
+from. To obtain a list of databases, use `imf_databases`, like so:
 
 ``` r
-data_list <- imf_data(database_id = "DOT", indicator = "TXG_FOB_USD", 
-                      country = "US", return_raw = TRUE)
+#Fetch the list of databases available through the IMF API
+databases <- imf_databases()
 ```
 
-Then extract the data series (it is typically contained in
-`CompactData$DataSet$Series`):
+This function returns the IMF’s listing of 259 databases available
+through the API. (In reality, 7 of the listed databases are defunct and
+not actually available: FAS_2015, GFS01, FM202010, APDREO202010,
+AFRREO202010, WHDREO202010, BOPAGG_2020.)
+
+To view and explore the database list, it’s possible to open a viewing
+pane with `View(databases)` or to create an attractive table with
+`knitr::kable(databases)`. Or, if you already know which database you
+want, you can fetch the corresponding code by searching the description
+column for the database name with `stringr::str_detect`. For instance,
+here’s how to search for the Primary Commodity Price System:
 
 ``` r
-data_df <- data_list$CompactData$DataSet$Series
+# Filter the 'databases' data frame for descriptions matching `commodity price`
+commodity_db <- databases[str_detect(tolower(databases$description),
+                                     "commodity price"),]
 
-names(data_df)
+# Display the result using knitr::kable
+kable(commodity_db)
 ```
 
-    ## [1] "@FREQ"             "@REF_AREA"         "@INDICATOR"       
-    ## [4] "@COUNTERPART_AREA" "@UNIT_MULT"        "@TIME_FORMAT"     
-    ## [7] "Obs"
+|     | database_id | description                           |
+|:----|:------------|:--------------------------------------|
+| 242 | PCPS        | Primary Commodity Price System (PCPS) |
 
-You can then subset and clean up `data_df` to suit your purposes.
+### Fetching a List of Parameters and Input Codes with imf_parameters and imf_parameter_defs
+
+Once you have a database_id, it’s possible to make a call to
+`imf_dataset` to fetch the entire database:
+`imf_dataset(commodity_db$database_id)`. However, while this will
+succeed for some small databases, it will fail for many of the larger
+ones. And even when it succeeds, fetching an entire database can take a
+long time. You’re much better off supplying additional filter parameters
+to reduce the size of your request.
+
+Requests to databases available through the IMF API are complicated by
+the fact that each database uses a different set of parameters when
+making a request. (At last count, there were 43 unique parameters used
+in making API requests from the various databases!) You also have to
+have the list of valid input codes for each parameter. The
+`imf_parameters` function solves this problem. Use the function to
+obtain the full list of parameters and valid input codes for a given
+database:
+
+``` r
+# Fetch list of valid parameters and input codes for commodity price database
+params <- imf_parameters(commodity_db$database_id)
+```
+
+The `imf_parameters` function returns a named list of data frames. Each
+named list item corresponds to a parameter used in making requests from
+the database.
+
+``` r
+# Check class of `params` object
+class(params)
+```
+
+    ## [1] "list"
+
+``` r
+# Check names of `params` list items
+names(params)
+```
+
+    ## [1] "freq"         "ref_area"     "commodity"    "unit_measure"
+
+In the event that a parameter name is not self-explanatory, the
+`imf_parameter_defs` function can be used to fetch short text
+descriptions of each parameter:
+
+``` r
+# Fetch and display parameter text descriptions for the commodity price database
+param_descriptions <- imf_parameter_defs(commodity_db$database_id)
+kable(param_descriptions)
+```
+
+| parameter    | description        |
+|:-------------|:-------------------|
+| freq         | Frequency          |
+| ref_area     | Geographical Areas |
+| commodity    | Indicator          |
+| unit_measure | Unit               |
+
+Each named list item is a data frame containing a vector of valid input
+codes that can be used with the named parameter, and a vector of text
+descriptions of what each code represents. The `$` operator can be used
+to access the data frame for a given parameter, and the data frame can
+be explored using `kable` or `View`:
+
+``` r
+# Display the data frame of valid input codes for the frequency parameter
+kable(params$freq)
+```
+
+| input_code | description |
+|:-----------|:------------|
+| A          | Annual      |
+| M          | Monthly     |
+| Q          | Quarterly   |
+
+### Supplying Parameter Arguments to imf_dataset: A Tale of Two Workflows
+
+There are two ways to supply parameters to `imf_dataset`: by supplying
+vector arguments or by supplying a modified parameters list. The vector
+arguments workflow will likely be more intuitive for most users, but the
+list argument workflow is more robust against changes to the API
+endpoint. If you ever get an “unused argument” error when trying to use
+the vector arguments workflow, try using the list argument workflow
+instead.
+
+To supply vector arguments, just find the codes you want and supply them
+to `imf_dataset` using the parameter name as the argument name. The
+example below shows how to request 2000–2015 annual coal prices from the
+Primary Commodity Price System database:
+
+``` r
+# Fetch the 'freq' input code for annual frequency
+selected_freq <- params$freq$input_code[str_detect(tolower(params$freq$description),"annual")]
+
+# Fetch the 'commodity' input code for coal
+selected_commodity <- params$commodity$input_code[str_detect(tolower(params$commodity$description),"coal index")]
+
+# Fetch the 'unit_measure' input code for index
+selected_unit_measure <- params$unit_measure$input_code[str_detect(tolower(params$unit_measure$description),"index")]
+
+# Request data from the API
+df <- imf_dataset(database_id = commodity_db$database_id,
+         freq = selected_freq, commodity = selected_commodity,
+         unit_measure = selected_unit_measure,
+         start_year = 2000, end_year = 2015)
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+| date | value            | freq | ref_area | commodity | unit_measure | unit_mult | time_format |
+|:-----|:-----------------|:-----|:---------|:----------|:-------------|:----------|:------------|
+| 2000 | 39.3510230293202 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2001 | 49.3378587284039 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2002 | 39.4949091648006 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2003 | 43.2878876950788 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2004 | 82.9185858052862 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2005 | 71.9223526096731 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+
+To supply a list object, modify each data frame in the `params` list
+object to retain only the rows you want, and then supply the modified
+list object to `imf_dataset` as its `parameters` argument. Here is how
+to make the same request for annual coal price data using a parameters
+list:
+
+``` r
+# Filter the frequency data frame for annual frequency
+params$freq <- params$freq %>%
+    filter(str_detect(tolower(.$description),"annual"))
+
+# Filter the commodity data frame for the coal index
+params$commodity <- params$commodity %>%
+    filter(str_detect(tolower(.$description),"coal index"))
+
+# Filter the unit_measure data frame for index
+params$unit_measure <- params$unit_measure %>%
+    filter(str_detect(tolower(.$description),"index"))
+
+# Request data from the API
+df <- imf_dataset(database_id = commodity_db$database_id,
+               parameters = params,
+         start_year = 2000, end_year = 2015)
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+| date | value            | freq | ref_area | commodity | unit_measure | unit_mult | time_format |
+|:-----|:-----------------|:-----|:---------|:----------|:-------------|:----------|:------------|
+| 2000 | 39.3510230293202 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2001 | 49.3378587284039 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2002 | 39.4949091648006 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2003 | 43.2878876950788 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2004 | 82.9185858052862 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+| 2005 | 71.9223526096731 | A    | W00      | PCOAL     | IX           | 0         | P1Y         |
+
+### Working with the Returned Data Frame
+
+Note that all columns in the returned data frame are character vectors,
+and that to plot the series we will need to convert to valid numeric or
+date formats:
+
+Also note that the returned data frame has mysterious-looking codes as
+values in some columns.
+
+Codes in the `time_format` column are [ISO 8601 duration
+codes](https://en.m.wikipedia.org/wiki/ISO_8601#Durations). In this
+case, “P1Y” means “periods of 1 year.” The `unit_mult` column represents
+the number of zeroes you should add to the `value` column. For instance,
+if `value` is in millions, then the unit multiplier will be 6. If in
+billions, then the unit multiplier will be 9.
+
+The meanings of the other codes are stored in our `params` object and
+can be fetched with a join. For instance to fetch the meaning of the
+ref_area code “W00”, we can perform a left join with the
+`params$ref_area` data frame and use `select` to replace ref_area with
+the parameter description:
+
+``` r
+# Join df with params$ref_area to fetch code description
+df <- left_join(df,params$ref_area,by=c("ref_area"="input_code")) %>%
+    select(date, value, freq, ref_area = description, commodity, unit_measure, unit_mult, time_format)
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+| date | value            | freq | ref_area                        | commodity | unit_measure | unit_mult | time_format |
+|:-----|:-----------------|:-----|:--------------------------------|:----------|:-------------|:----------|:------------|
+| 2000 | 39.3510230293202 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2001 | 49.3378587284039 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2002 | 39.4949091648006 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2003 | 43.2878876950788 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2004 | 82.9185858052862 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+| 2005 | 71.9223526096731 | A    | All Countries, excluding the IO | PCOAL     | IX           | 0         | P1Y         |
+
+Alternatively, we can simply replace the code in our data series with
+the corresponding description in `params`. Here, we replace each
+`unit_measure` code with the corresponding description in
+`params$unit_measure`:
+
+``` r
+# Replace each unique unit_measure code in df with corresponding description
+# in params$unit_measure
+for(code in unique(df$unit_measure)){
+    df$unit_measure[df$unit_measure == code] <- params$unit_measure$description[params$unit_measure$input_code == code]
+}
+
+# Display the first few entries in the retrieved data frame using knitr::kable
+kable(head(df))
+```
+
+| date | value            | freq | ref_area                        | commodity | unit_measure | unit_mult | time_format |
+|:-----|:-----------------|:-----|:--------------------------------|:----------|:-------------|:----------|:------------|
+| 2000 | 39.3510230293202 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2001 | 49.3378587284039 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2002 | 39.4949091648006 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2003 | 43.2878876950788 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2004 | 82.9185858052862 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+| 2005 | 71.9223526096731 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
+
+## Development Notes
+
+Planned features for future versions:
+
+- Add a workaround to support “All” codes that are listed as valid input
+  codes in the IMF parameters lists but don’t actually work when used in
+  API requests
+- Determine maximum length of a request URL, and split into multiple
+  requests if the URL is too long
+- Submit to CRAN
