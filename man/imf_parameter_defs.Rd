@@ -4,7 +4,7 @@
 \alias{imf_parameter_defs}
 \title{Get definitions of IMF API parameters}
 \usage{
-imf_parameter_defs(database_id, times = 3, inputs_only = F)
+imf_parameter_defs(database_id, times = 3, inputs_only = T)
 }
 \arguments{
 \item{database_id}{character string of a \code{database_id} from

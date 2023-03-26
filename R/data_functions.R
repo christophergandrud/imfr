@@ -68,7 +68,7 @@ imf_parameters <- function(database_id, times = 3) {
 
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
     tryCatch({codelist <- imf_dimensions(database_id,times)}, error = function(e) {
-        if(grepl('<string xmlns=',e$message)){
+        if(grepl('There is an issue',e$message)){
             stop(paste0(e$message,'\n\nDid you supply a valid database_id? Use imf_databases to find.'),
                  call. = FALSE)
         }else{
@@ -125,8 +125,16 @@ imf_parameter_defs <- function(database_id, times = 3, inputs_only=T) {
     }
 
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
-    parameterlist <- imf_dimensions(database_id,times,inputs_only) %>%
-        select(parameter,description)
+    tryCatch({parameterlist <- imf_dimensions(database_id,times,inputs_only) %>%
+        select(parameter,description)}, error = function(e){
+            if(grepl('There is an issue',e$message)){
+                stop(paste0(e$message,'\n\nDid you supply a valid database_id? Use imf_databases to find.'),
+                     call. = FALSE)
+            }else{
+                stop(e$message,
+                     call. = FALSE)
+            }
+        })
     return(parameterlist)
 }
 

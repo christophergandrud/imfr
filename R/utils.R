@@ -22,13 +22,16 @@ download_parse <- limit_rate(function(URL, times = 3) {
     cont <- raw_download %>% content(as='text',encoding='UTF-8')
     status <- raw_download$status_code
     header <- raw_download$request$headers[[1]]
-    err_message <- paste0("API request failed. URL: '",URL,"', Status: '",status,
-                          "', Content: '",substr(cont, 1, 30))
 
     if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
         grepl('<!DOCTYPE html', cont) |
         grepl('<string xmlns="http://schemas.m', cont) |
         grepl('<html xmlns=', cont)) {
+        matches <- regexec("<[^>]+>(.*?)<\\/[^>]+>", cont)
+        inner_text <- regmatches(cont, matches)[[1]][2]
+        output_string <- gsub(" GKey\\s*=\\s*[a-f0-9-]+", "", inner_text)
+        err_message <- paste0("API request failed. Status: '",status,
+                              "', Content: '",output_string,"'")
         stop(err_message)
     }
 
