@@ -5,7 +5,7 @@ test_that("imf_databases works", {
 
 test_that("imf_parameters works", {
     params <- imf_parameters("BOP")
-    expect_equal(all(params$input_code == c("A","M","Q")), TRUE)
+    expect_equal(all(params$freq$input_code == c("A","M","Q")), TRUE)
     expect_error(imf_parameters(times=1))
     expect_error(imf_parameters(database_id="not_a_real_database",times=1))
 })
