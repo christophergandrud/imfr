@@ -118,14 +118,14 @@ imf_parameters <- function(database_id, times = 3) {
 #'
 #' @export
 
-imf_parameter_defs <- function(database_id, times = 3, inputs_only=F) {
+imf_parameter_defs <- function(database_id, times = 3, inputs_only=T) {
     if (missing(database_id)){
         stop('Must supply database_id.\nUse imf_databases to find.',
              call. = FALSE)
     }
 
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
-    parameterlist <- imf_dimensions(database_id,times) %>%
+    parameterlist <- imf_dimensions(database_id,times,inputs_only) %>%
         select(parameter,description)
     return(parameterlist)
 }
