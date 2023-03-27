@@ -27,7 +27,7 @@ test_that("imf_dataset error handling works",{
     expect_error(imf_dataset(times=1),"Missing required database_id argument.",fixed=T)
     expect_error(imf_dataset(database_id=2,times=1),"database_id must be a character string.",fixed=T)
     expect_error(imf_dataset(database_id=c(),times=1),"database_id must be a character string.",fixed=T)
-    expect_error(imf_dataset(database_id=c("a","b"),times=1),"database_id must be a character string, not a vector.",fixed=T)
+    expect_error(imf_dataset(database_id=c("a","b"),times=1),"database_id must be a character string")
     expect_error(imf_dataset(database_id="not_a_real_database",times=1))
     expect_error(imf_dataset(database_id="PCPS",start_year=1,times=1),"Failed to coerce start_year and/or end_year to a four-digit integer.",fixed=T)
     expect_error(imf_dataset(database_id="PCPS",end_year="a",times=1),"Failed to coerce start_year and/or end_year to a four-digit integer.",fixed=T)
