@@ -36,7 +36,7 @@ In addition to correcting these major problems, Version 2 also extends the funct
 To install the development version of `imfr`, use:
 
 ``` {r install_package, eval = FALSE}
-devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)
+devtools::install_github("christophergandrud/imfr")
 ```
 
 ## Usage
