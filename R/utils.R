@@ -7,7 +7,7 @@
 #'
 #' @noRd
 
-download_parse <- limit_rate(function(URL, times = 2) {
+download_parse <- limit_rate(function(URL, times = 3) {
     if (nzchar(Sys.getenv("IMF_APP_NAME"))) {
         app_name <- Sys.getenv("IMF_APP_NAME")
         if(nchar(app_name) > 255){
