@@ -242,6 +242,7 @@ kable(head(df))
 
 Planned features for future versions:
 
+* Add support for including annotations with metadata: `download_parse('http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/CL_AREA_DOT')['Structure']['KeyFamilies']['KeyFamily']['Annotations']`
 * Add a workaround to support "All" codes that are listed as valid input codes in the IMF parameters lists but don't actually work when used in API requests
 * Determine maximum length of a request URL, and split into multiple requests if the URL is too long
 * Submit to CRAN
