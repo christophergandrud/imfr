@@ -241,6 +241,7 @@ imf_dataset <- function(database_id, parameters, start_year, end_year,
                         ref_sector, reporting_type, series, sex, sto,
                         summary_statistics, survey, transformation, type,
                         unit_measure, urbanisation, valuation) {
+    input_code <- NULL
     if(missing(database_id)){
         stop("Missing required database_id argument.",call.=F)
     }

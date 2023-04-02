@@ -5,6 +5,11 @@ data/all_iso.csv
 ^doc$
 ^Meta$
 ^README\.Rmd$
+<<<<<<< HEAD
 ^\.github$
 ^scripts$
 ^tests/testthat/dataservices\.imf\.org$
+=======
+^\README_files$
+^\.github$
+>>>>>>> ab9a326af366044ccf1f2f1b700849ad168e9b99

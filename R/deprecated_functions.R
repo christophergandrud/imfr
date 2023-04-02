@@ -168,6 +168,7 @@ imf_data <- function(database_id, indicator, country = 'all',
                      start = 2000, end = format(Sys.Date(),"%Y"),
                      freq = 'A', return_raw = FALSE, print_url = FALSE,
                      times = 3) {
+    iso2c <- unit_measure <- value <- NULL
     .Deprecated("imf_dataset")
     if(missing(database_id)){
         stop("database_id is a required argument.",
