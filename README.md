@@ -44,7 +44,7 @@ suggested workflows and example vignettes.
 To install the development version of `imfr`, use:
 
 ``` r
-devtools::install_github("christophergandrud/imfr", build_vignettes = TRUE)'
+devtools::install_github("christophergandrud/imfr")
 ```
 
 ## Usage
@@ -62,6 +62,13 @@ installed, load these packages using the `library` function:
 # Load libraries
 library(imfr)
 library(tidyverse)
+```
+
+    ## Warning: package 'tibble' was built under R version 4.2.3
+
+    ## Warning: package 'dplyr' was built under R version 4.2.3
+
+``` r
 library(stringr)
 library(knitr)
 ```
@@ -298,6 +305,15 @@ kable(head(df))
 Note that all columns in the returned data frame are character vectors,
 and that to plot the series we will need to convert to valid numeric or
 date formats:
+
+``` r
+#Coerce date and value columns to plottable formats and create a simple plot
+df %>%
+    mutate(date = as.Date(paste0(date,"-01-01")),
+           value = as.numeric(value)) %>%
+    ggplot(aes(x=date,y=value,color=commodity)) +
+    geom_line()
+```
 
 Also note that the returned data frame has mysterious-looking codes as
 values in some columns.

@@ -65,6 +65,14 @@ imf_parameters <- function(database_id, times = 3) {
         stop('Must supply database_id.\nUse imf_databases to find.',
              call. = FALSE)
     }
+    if (!(inherits(database_id, "character"))){
+        stop("database_id must be a character string.",
+             call. = FALSE)
+    }
+    if (!(length(database_id) == 1L)){
+        stop("database_id must be a character string, not a vector, list, or dataframe.",
+             call. = FALSE)
+    }
 
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/'
     tryCatch({codelist <- imf_dimensions(database_id,times)}, error = function(e) {
@@ -121,6 +129,14 @@ imf_parameters <- function(database_id, times = 3) {
 imf_parameter_defs <- function(database_id, times = 3, inputs_only=T) {
     if (missing(database_id)){
         stop('Must supply database_id.\nUse imf_databases to find.',
+             call. = FALSE)
+    }
+    if (!(inherits(database_id, "character"))){
+        stop("database_id must be a character string.",
+             call. = FALSE)
+    }
+    if (!(length(database_id) == 1L)){
+        stop("database_id must be a character string, not a vector, list, or dataframe.",
              call. = FALSE)
     }
 
@@ -233,7 +249,7 @@ imf_dataset <- function(database_id, parameters, start_year, end_year,
              call. = FALSE)
     }
     if (!(length(database_id) == 1L)){
-        stop("database_id must be a character string, not a vector.",
+        stop("database_id must be a character string, not a vector, list, or dataframe.",
              call. = FALSE)
     }
 

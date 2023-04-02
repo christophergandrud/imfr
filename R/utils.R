@@ -17,7 +17,7 @@ download_parse <- limit_rate(function(URL, times = 3) {
         app_name <- paste0("imfr/",packageVersion("imfr"))
     }
 
-    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"), user_agent(app_name),times = times, pause_base = 2) %>%
+    raw_download <- RETRY('GET', URL, add_headers(Accept = "application/json"), user_agent(app_name),times = 2, pause_base = 5) %>%
         suppressWarnings()
     cont <- raw_download %>% content(as='text',encoding='UTF-8')
     status <- raw_download$status_code
@@ -26,18 +26,25 @@ download_parse <- limit_rate(function(URL, times = 3) {
     if (grepl('<!DOCTYPE HTML PUBLIC', cont) |
         grepl('<!DOCTYPE html', cont) |
         grepl('<string xmlns="http://schemas.m', cont) |
-        grepl('<html xmlns=', cont)) {
+        grepl('<html xmlns=', cont) |
+        grepl('<html><head>', cont)) {
         matches <- regexec("<[^>]+>(.*?)<\\/[^>]+>", cont)
         inner_text <- regmatches(cont, matches)[[1]][2]
         output_string <- gsub(" GKey\\s*=\\s*[a-f0-9-]+", "", inner_text)
-        err_message <- paste0("API request failed. Status: '",status,
-                              "', Content: '",output_string,"'")
+        if(grepl('Rejected', cont) & as.character(status) == "200"){
+            err_message <- paste0("API request failed. Status: '",status,
+                                  "', Content: '",output_string,"'",
+                                  "\n\nToo many requests. Take a break and try again.")
+        }else{
+            err_message <- paste0("API request failed. Status: '",status,
+                                  "', Content: '",output_string,"'")
+        }
         stop(err_message)
     }
 
     json_parsed <- fromJSON(cont)
     return(json_parsed)
-}, rate(n = 5, period = 5))
+}, rate(n = 3, period = 5))
 
 #' Retrieve the list of codes for dimensions of an individual IMF database.
 #'

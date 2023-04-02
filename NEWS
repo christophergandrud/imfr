@@ -1,5 +1,14 @@
 # All updates will be detailed here
 
+## Version 0.2.0.1
+
+- Reduced default `times` to retry requests to 2, but increased base wait time
+to 5 seconds
+
+- Added some additional error handling for specificity
+
+- Reduced rate throttle to 3 calls per 5 seconds to be kinder to the API
+
 ## Version 0.2.0
 
 - Significant API changes and expanded capabilities.
