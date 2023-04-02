@@ -62,45 +62,9 @@ installed, load these packages using the `library` function:
 # Load libraries
 library(imfr)
 library(tidyverse)
-```
-
-    ## Warning: package 'tibble' was built under R version 4.2.3
-
-    ## Warning: package 'dplyr' was built under R version 4.2.3
-
-``` r
 library(stringr)
 library(knitr)
 ```
-
-### Setting a Unique Application Name with imf_app_name
-
-The `imf_app_name()` function allows users to set a custom application
-name to be used when making API calls to the IMF API. The IMF API has an
-application-based rate limit of 50 requests per second, with the
-application identified by the “user_agent” variable in the request
-header.
-
-This could prove problematic if the `imfr` library became too popular
-and too many users tried to make simultaneous API requests using the
-default app name. By setting a custom application name, users can avoid
-hitting rate limits and being blocked by the API. The `imf_app_name()`
-function sets the application name by changing the `IMF_APP_NAME`
-variable in the environment. If this variable doesn’t exist,
-`imf_app_name()` will create it.
-
-To set a custom application name, simply call the `imf_app_name()`
-function with your desired application name as an argument:
-
-``` r
-imf_app_name("my_custom_app_name")
-```
-
-The function will throw an error if the provided name is missing, NULL,
-NA, not a string, or longer than 255 characters. If the provided name is
-“imfr” (the default) or an empty string, the function will issue a
-warning recommending the use of a unique app name to avoid hitting rate
-limits.
 
 ### Fetching an Index of Databases with the imf_databases Function
 
@@ -141,7 +105,7 @@ kable(commodity_db)
 
 |     | database_id | description                           |
 |:----|:------------|:--------------------------------------|
-| 242 | PCPS        | Primary Commodity Price System (PCPS) |
+| 240 | PCPS        | Primary Commodity Price System (PCPS) |
 
 ### Fetching a List of Parameters and Input Codes with imf_parameters and imf_parameter_defs
 
@@ -374,10 +338,78 @@ kable(head(df))
 | 2004 | 82.9185858052862 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
 | 2005 | 71.9223526096731 | A    | All Countries, excluding the IO | PCOAL     | Index        | 0         | P1Y         |
 
+## Global imfr options for managing high-rate requests
+
+### Rate/bandwidth limits and mandatory timeout penalties for rejected requests
+
+The IMF API has an application-level rate limit of 50 requests per
+second per application, a user-level rate limit of 10 requests per
+second per IP address, and an unspecified bandwidth limit seemingly
+imposed on the sum total of API traffic at any given time. The bandwidth
+limit, in particular, makes it exceedingly difficult to throttle API
+requests, especially if performing repeated function calls at a
+high-traffic time or across multiple docker containers.
+
+Note that the core data functions in `imfr` have a `times` argument that
+specifies how many times the function should retry an API request that
+the API rejected due to a rate or bandwidth limit. By default, requests
+will be tried three times. An exponentially increasing timeout penalty
+is imposed between retries, with a base timeout period of 5 seconds that
+doubles on every subsequent attempt.
+
+This mandatory timeout can increase run times considerably if you
+frequently run up against rate or bandwidth limits, so you may find that
+your process runs much faster and more reliably when appropriate
+throttling and caching are used.
+
+### Setting imf_app_name, imf_wait_time, and imf_use_cache
+
+By default, `imfr` imposes a default 1.5-second wait time between API
+requests. To reduce run-time and bandwidth use, `imfr` also employs a
+two-week cache of all data returned by calls to `imf_databases`,
+`imf_parameters`, and `imf_parameter_defs`. (Data returned from these
+function calls is mostly stable and changes only infrequently.) The
+default `imfr` application name supplied to the API (as user agent in
+the request header) takes the form “imfr/{version_number}”. These
+settings are optimized to avoid hitting rate and bandwidth limits during
+iterated function calls.
+
+These settings can be controlled with global R options:
+
+``` r
+options(
+    imf_use_cache = TRUE,
+    imf_wait_time = 1.5,
+    imf_app_name = paste0("imfr/",utils::packageVersion("imfr"))
+    )
+```
+
+Note that `imfr` supplies helper functions for setting these global
+options: `set_imf_use_cache`, `set_imf_wait_time`, and
+`set_imf_app_name`:
+
+``` r
+set_imf_app_name("my_custom_app_name")
+set_imf_wait_time(2.5)
+set_imf_use_cache(FALSE)
+```
+
+It’s recommended that you use these functions for setting options rather
+than setting them manually, as the functions will validate the values
+you supply. (If you manually set the options to invalid values, they
+will be silently ignored and the defaults used.)
+
 ## Development Notes
 
 Planned features for future versions:
 
+- Add support for including annotations with metadata:
+  `download_parse('http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/CL_AREA_DOT')['Structure']['KeyFamilies']['KeyFamily']['Annotations']`
+- Implement caching of imf_database and imf_parameters calls to reduce
+  bandwidth burden of repeat requests
+- Adjust approach to rate limiting; use an enforced wait time wrapper,
+  adjust wait time during unit testing, and only retry on “Bandwidth” or
+  “Rejected” content messages
 - Add a workaround to support “All” codes that are listed as valid input
   codes in the IMF parameters lists but don’t actually work when used in
   API requests

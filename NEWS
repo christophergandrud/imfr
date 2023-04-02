@@ -1,9 +1,18 @@
 # All updates will be detailed here
 
+## Version 0.2.1.0
+
+- `imfr` now uses a 2-week on-disk cache to store data returned from `imf_databases`, `imf_parameters`, and `imf_parameter_defs` function calls
+
+- New `set_imf_wait_time` and `set_imf_use_cache` functions allow users to control caching and enforced wait time between function calls
+
+- Data functions now only retry calls rejected by the API endpoint for rate or bandwidth reasons with 200 status code
+
+- Set default `times` argument to 3 and introduced exponentially increasing wait time between retries with a base of 5 seconds on the first retry
+
 ## Version 0.2.0.1
 
-- Reduced default `times` to retry requests to 2, but increased base wait time
-to 5 seconds
+- Reduced default `times` to retry requests to 2, but increased base wait time to 5 seconds
 
 - Added some additional error handling for specificity
 

@@ -1,7 +1,7 @@
 Package: imfr
 Type: Package
 Title: Download Data from the International Monetary Fund's Data API
-Version: 0.2.0.1
+Version: 0.2.1.0
 Description: Explore and download data from the International Monetary Fund's
     data API <http://data.imf.org/>.
 Date: 2023-03-27
@@ -15,12 +15,13 @@ URL: https://github.com/christophergandrud/imfr
 BugReports: https://github.com/christophergandrud/imfr/issues
 License: GPL (>= 3)
 Imports:
+    cachem,
+    digest,
     dplyr,
     httr (>= 1.2.0),
     jsonlite,
     methods,
     purrr,
-    ratelimitr,
     tidyr
 LazyData: TRUE
 RoxygenNote: 7.2.3

@@ -6,3 +6,5 @@ data/all_iso.csv
 ^Meta$
 ^README\.Rmd$
 ^\.github$
+^scripts$
+^tests/testthat/dataservices\.imf\.org$
