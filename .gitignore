@@ -9,3 +9,5 @@ inst/doc
 docs/
 /Meta/
 README_files/
+tests/testthat/.my_cache
+tests/testthat/.testcache
