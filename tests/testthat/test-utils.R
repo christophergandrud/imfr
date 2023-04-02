@@ -1,3 +1,30 @@
+test_that("download_parse_cached handles destroyed cache", {
+    # Set option to use the disk cache
+    set_imf_use_cache(TRUE)
+
+    # Create the cache reference object
+    .global_cache <- cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = "/testcache")
+
+    # Test function for download_parse
+    download_parse <- function(url, times = 3) {
+        return(paste("Downloaded and parsed:", url))
+    }
+
+    # Test URL
+    test_url <- "https://www.example.com"
+
+    # Call download_parse_cached to store the result in the cache
+    result1 <- download_parse_cached(test_url, download_parse)
+
+    # Destroy the cache
+    .global_cache$destroy()
+
+    # Call download_parse_cached again, expecting it to handle the destroyed cache
+    result2 <- download_parse_cached(test_url, download_parse)
+
+    expect_equal(result2, paste("Downloaded and parsed:", test_url))
+})
+
 test_that("download_parse_cached works correctly", {
     # Define helper function to remove cache items for a list of urls
     remove_cache_items <- function(urls) {

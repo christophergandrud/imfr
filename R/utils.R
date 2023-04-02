@@ -105,6 +105,12 @@ download_parse_cached <- function(url, download_parse = download_parse, times = 
     if (!exists(".global_cache", envir = .GlobalEnv)) {
         # If it doesn't exist, create a disk cache reference object with expiry time of 2 weeks
         assign(".global_cache", cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = "/my_cache"), envir = .GlobalEnv)
+    } else{
+        #If it does exist, make sure it still points to a valid directory (i.e.
+        #cache hasn't been destroyed)
+        if (!dir.exists(.global_cache$info()$dir)){
+            assign(".global_cache", cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = "/my_cache"), envir = .GlobalEnv)
+        }
     }
 
     # Get the cache key by hashing the input URL
