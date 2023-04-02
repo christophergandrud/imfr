@@ -5,4 +5,5 @@ data/all_iso.csv
 ^doc$
 ^Meta$
 ^README\.Rmd$
+^\README_files$
 ^\.github$
