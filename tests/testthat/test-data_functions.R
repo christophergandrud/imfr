@@ -1,5 +1,5 @@
 # Set a stricter rate limit for cross-platform testing
-set_imf_wait_time(2.5)
+set_imf_wait_time(5)
 
 test_that("imf_databases works", {
     expect_equal(nrow(imf_databases()) > 1, TRUE)

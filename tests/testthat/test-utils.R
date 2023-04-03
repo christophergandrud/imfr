@@ -1,6 +1,6 @@
 test_that("Enforced wait time between imf_get calls works correctly", {
     # Set the imf_wait_time to 2.5 seconds
-    set_imf_wait_time(2.5)
+    set_imf_wait_time(5)
 
     # Call imf_get for the first time
     start_time <- Sys.time()
@@ -14,7 +14,7 @@ test_that("Enforced wait time between imf_get calls works correctly", {
     time_diff <- as.numeric(difftime(end_time, start_time, units = "secs"))
 
     # Test if the time difference is greater than or equal to 2.5 seconds
-    expect_true(time_diff >= 2.5)
+    expect_true(time_diff >= 5)
 
     # Additional tests to check if the response status codes are 200 (successful)
     expect_equal(status_code(response1), 200)
