@@ -31,9 +31,6 @@ test_that("set_imf_wait_time works correctly", {
 })
 
 test_that("set_imf_use_cache sets the option correctly and handles errors", {
-    # Save the current option value to restore it later
-    old_option <- getOption("imf_use_cache")
-
     # Test that the option is set correctly when use_cache is TRUE
     set_imf_use_cache(TRUE)
     expect_equal(getOption("imf_use_cache"), TRUE)
@@ -49,7 +46,4 @@ test_that("set_imf_use_cache sets the option correctly and handles errors", {
     expect_error(set_imf_use_cache("not_a_boolean"), "The 'use_cache' argument must be a valid, non-NA, non-null boolean value.")
     expect_error(set_imf_use_cache(NA), "The 'use_cache' argument must be a valid, non-NA, non-null boolean value.")
     expect_error(set_imf_use_cache(NULL), "The 'use_cache' argument must be a valid, non-NA, non-null boolean value.")
-
-    # Restore the original option value
-    options(imf_use_cache = old_option)
 })

@@ -17,7 +17,9 @@ test_that("download_parse_cached handles destroyed cache", {
     result1 <- download_parse_cached(test_url, download_parse)
 
     # Destroy the cache
-    .global_cache$destroy()
+    if(dir.exists(file.path(path.expand('~'),".imfr"))){
+        unlink(file.path(path.expand('~'),".imfr"))
+    }
 
     # Call download_parse_cached again, expecting it to handle the destroyed cache
     result2 <- download_parse_cached(test_url, download_parse)
@@ -29,7 +31,7 @@ test_that("download_parse_cached works correctly", {
     # Define helper function to remove cache items for a list of urls
     remove_cache_items <- function(urls) {
             # Create a disk cache reference object
-            cache <- cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = ".my_cache")
+            cache <<- cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = file.path(path.expand('~'),".imfr"))
             for (url in urls) {
                 cache_key <- digest::digest(url, algo = "md5")
                 cache$remove(cache_key)
@@ -115,3 +117,7 @@ test_that("Enforced wait time between imf_get calls works correctly", {
     expect_equal(status_code(response1), 200)
     expect_equal(status_code(response2), 200)
 })
+
+if(dir.exists(file.path(path.expand('~'),".imfr"))){
+        unlink(file.path(path.expand('~'),".imfr"))
+    }

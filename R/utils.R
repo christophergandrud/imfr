@@ -19,7 +19,7 @@ min_wait_time_limited <- function() {
                 min_wait_time <- 1.5
             }
 
-            if(exists(".last_called", envir = .GlobalEnv)){
+            if(exists(".last_called") && !is.null(.last_called) && is.double(.last_called)){
                 elapsed <- as.numeric(Sys.time() - .last_called, units = "secs")
                 left_to_wait <- min_wait_time - elapsed
                 if (left_to_wait > 0) {
@@ -28,7 +28,7 @@ min_wait_time_limited <- function() {
             }
 
             ret <- func(...)
-            assign(".last_called", Sys.time(), envir = .GlobalEnv)
+            .last_called <<- Sys.time()
             return(ret)
         }
     }
@@ -90,6 +90,7 @@ download_parse <- function(URL, times = 3) {
 #'
 #' @importFrom cachem cache_disk is.key_missing
 #' @importFrom digest digest
+#' @importFrom methods S3Class
 #'
 #' @noRd
 
@@ -101,19 +102,14 @@ download_parse_cached <- function(url, download_parse = download_parse, times = 
         use_cache <- TRUE
     }
 
-    # Check if the cache reference object exists in the global environment
-    if (!exists(".global_cache", envir = .GlobalEnv)) {
-        tryCatch({
-
-        })
-        # If it doesn't exist, create a disk cache reference object with expiry time of 2 weeks
-        assign(".global_cache", cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = ".my_cache"), envir = .GlobalEnv)
-    } else{
-        #If it does exist, make sure it still points to a valid directory (i.e.
-        #cache hasn't been destroyed)
-        if (!dir.exists(.global_cache$info()$dir)){
-            assign(".global_cache", cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = ".my_cache"), envir = .GlobalEnv)
-        }
+    # Check if the cache reference object exists and is the correct object type
+    # and points to a valid directory
+    if (!exists(".global_cache") ||
+        is.null(.global_cache) ||
+        !("cachem" %in% S3Class(.global_cache)) ||
+        !dir.exists(.global_cache$info()$dir)) {
+        # If not, create a disk cache reference object with expiry time of 2 weeks
+        .global_cache <<- cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = file.path(path.expand('~'),".imfr"))
     }
 
     # Get the cache key by hashing the input URL

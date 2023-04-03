@@ -11,3 +11,5 @@ docs/
 README_files/
 tests/testthat/.my_cache
 tests/testthat/.testcache
+.my_cache
+.testcache

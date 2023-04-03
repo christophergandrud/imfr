@@ -13,3 +13,7 @@ data/all_iso.csv
 ^\README_files$
 ^\.github$
 >>>>>>> ab9a326af366044ccf1f2f1b700849ad168e9b99
+^tests\testthat\.my_cache$
+^tests\testthat\.testcache$
+^.my_cache$
+^.testcache$
