@@ -1,3 +1,26 @@
+test_that("Enforced wait time between imf_get calls works correctly", {
+    # Set the imf_wait_time to 2.5 seconds
+    set_imf_wait_time(2.5)
+
+    # Call imf_get for the first time
+    start_time <- Sys.time()
+    response1 <- imf_get("https://example.com/")
+
+    # Call imf_get for the second time
+    response2 <- imf_get("https://example.com/")
+    end_time <- Sys.time()
+
+    # Calculate the time difference between the two calls
+    time_diff <- as.numeric(difftime(end_time, start_time, units = "secs"))
+
+    # Test if the time difference is greater than or equal to 2.5 seconds
+    expect_true(time_diff >= 2.5)
+
+    # Additional tests to check if the response status codes are 200 (successful)
+    expect_equal(status_code(response1), 200)
+    expect_equal(status_code(response2), 200)
+})
+
 test_that("download_parse_cached handles destroyed cache", {
     # Set option to use the disk cache
     set_imf_use_cache(TRUE)
@@ -28,7 +51,7 @@ test_that("download_parse_cached handles destroyed cache", {
 })
 
 test_that("download_parse_cached works correctly", {
-    # Define helper function to remove cache items for a list of urls
+    # Define helper function to remove cache items, if they exist, for a list of urls
     remove_cache_items <- function(urls) {
             # Create a disk cache reference object
             cache <<- cachem::cache_disk(max_age = 60 * 60 * 24 * 14, dir = file.path(path.expand('~'),".imfr"))
@@ -95,29 +118,7 @@ test_that("_download_parse works correctly", {
     expect_error(download_parse(invalid_url), "API request failed")
 })
 
-test_that("Enforced wait time between imf_get calls works correctly", {
-    # Set the imf_wait_time to 2.5 seconds
-    set_imf_wait_time(2.5)
-
-    # Call imf_get for the first time
-    start_time <- Sys.time()
-    response1 <- imf_get("https://example.com/")
-
-    # Call imf_get for the second time
-    response2 <- imf_get("https://example.com/")
-    end_time <- Sys.time()
-
-    # Calculate the time difference between the two calls
-    time_diff <- as.numeric(difftime(end_time, start_time, units = "secs"))
-
-    # Test if the time difference is greater than or equal to 2.5 seconds
-    expect_true(time_diff >= 2.5)
-
-    # Additional tests to check if the response status codes are 200 (successful)
-    expect_equal(status_code(response1), 200)
-    expect_equal(status_code(response2), 200)
-})
-
+set_imf_wait_time(1.5)
 if(dir.exists(file.path(path.expand('~'),".imfr"))){
         unlink(file.path(path.expand('~'),".imfr"))
-    }
+}
