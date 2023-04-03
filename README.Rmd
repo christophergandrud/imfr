@@ -29,7 +29,7 @@ The previous version of `imfr` allowed for specifying only three parameters—th
 
 The previous version also served users a third-party list of ISO2 country codes for use in requests rather than a database's own internal list of valid input codes. This, too, resulted in the failure of many an API request.
 
-In addition to correcting these major problems, Version 2 also extends the functionality of the package to allow for both broader requests and more specific requests than were possible in Version 1. Users may now use a much larger set of filter parameters in making requests. Additionally, Version 2 tries to address the problem of user-friendliness by introducing more package documentation with suggested workflows and example vignettes.
+In addition to correcting these major problems, Version 2 also extends the functionality of the package to allow for both broader requests and more specific requests than were possible in Version 1. Users may now use a much larger set of filter parameters in making requests. Additionally, Version 2 tries to address the problem of user-friendliness by introducing more package documentation with suggested workflows.
 
 ## Installation
 
@@ -262,6 +262,7 @@ It's recommended that you use these functions for setting options rather than se
 
 Planned features for future versions:
 
+* Adjust the way column names are handled by `imf_dataset` for cross-platform consistency with the Python sister library, `imfp`
 * Add support for including annotations with metadata: `download_parse('http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/CL_AREA_DOT')['Structure']['KeyFamilies']['KeyFamily']['Annotations']`
 * Add a workaround to support "All" codes that are listed as valid input codes in the IMF parameters lists but don't actually work when used in API requests
 * Determine maximum length of a request URL, and split into multiple requests if the URL is too long

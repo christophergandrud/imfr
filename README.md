@@ -37,7 +37,7 @@ more specific requests than were possible in Version 1. Users may now
 use a much larger set of filter parameters in making requests.
 Additionally, Version 2 tries to address the problem of
 user-friendliness by introducing more package documentation with
-suggested workflows and example vignettes.
+suggested workflows.
 
 ## Installation
 
@@ -95,7 +95,7 @@ column for the database name with `stringr::str_detect`. For instance,
 here’s how to search for the Primary Commodity Price System:
 
 ``` r
-# Filter the 'databases' data frame for descriptions matching `commodity price`
+# Filter the databases' data frame for descriptions matching 'commodity price'
 commodity_db <- databases[str_detect(tolower(databases$description),
                                      "commodity price"),]
 
@@ -403,13 +403,10 @@ will be silently ignored and the defaults used.)
 
 Planned features for future versions:
 
+- Adjust the way column names are handled by `imf_dataset` for
+  cross-platform consistency with the Python sister library, `imfp`
 - Add support for including annotations with metadata:
   `download_parse('http://dataservices.imf.org/REST/SDMX_JSON.svc/CodeList/CL_AREA_DOT')['Structure']['KeyFamilies']['KeyFamily']['Annotations']`
-- Implement caching of imf_database and imf_parameters calls to reduce
-  bandwidth burden of repeat requests
-- Adjust approach to rate limiting; use an enforced wait time wrapper,
-  adjust wait time during unit testing, and only retry on “Bandwidth” or
-  “Rejected” content messages
 - Add a workaround to support “All” codes that are listed as valid input
   codes in the IMF parameters lists but don’t actually work when used in
   API requests
