@@ -15,7 +15,7 @@
 
 imf_databases <- function(times = 3) {
     URL <- 'http://dataservices.imf.org/REST/SDMX_JSON.svc/Dataflow'
-    raw_dl <- download_parse(URL, times)
+    raw_dl <- download_parse_cached(URL, times)
 
     database_id <- raw_dl$Structure$Dataflows$Dataflow$KeyFamilyRef$KeyFamilyID
     description <- raw_dl$Structure$Dataflows$Dataflow$Name$`#text`
@@ -89,7 +89,7 @@ imf_parameters <- function(database_id, times = 3) {
             data.frame(input_code = c("A","M","Q"),
                        description = c("Annual","Monthly","Quarterly"))
         }else{
-            raw <- download_parse(paste0(URL,codelist$code[k]), times)$Structure$CodeLists$CodeList$Code
+            raw <- download_parse_cached(paste0(URL,codelist$code[k]), times)$Structure$CodeLists$CodeList$Code
             data.frame(input_code = raw$`@value`,
                        description = raw$Description$`#text`)
         }

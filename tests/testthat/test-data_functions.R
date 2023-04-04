@@ -1,5 +1,7 @@
+# Set a stricter rate limit for cross-platform testing
+set_imf_wait_time(5)
+
 test_that("imf_databases works", {
-    imf_app_name("imfr_data_functions_tester")
     expect_equal(nrow(imf_databases()) > 1, TRUE)
 })
 
@@ -73,3 +75,6 @@ test_that("imf_dataset include_metadata works",{
     expect_equal(S3Class(output[[1]]) == "list", TRUE)
     expect_equal(!any(is.na(output[[1]])), TRUE)
 })
+
+# Restore standard rate limit
+set_imf_wait_time(1.5)

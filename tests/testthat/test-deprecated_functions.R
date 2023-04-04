@@ -1,5 +1,7 @@
+# Set a stricter rate limit for cross-platform testing
+set_imf_wait_time(5)
+
 test_that("imf_ids works", {
-    imf_app_name("imfr_deprecated_functions_tester")
     expect_warning(ids <- imf_ids(),"(.*deprecated.*)")
     expect_equal(nrow(ids) > 1, TRUE)
     expect_equal(ncol(ids) == 2, TRUE)
@@ -52,3 +54,6 @@ test_that("imf_metadata works", {
     expect_equal(S3Class(output) == "list", TRUE)
     expect_equal(!any(is.na(output)), TRUE)
 })
+
+# Restore standard rate limit
+set_imf_wait_time(1.5)
