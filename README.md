@@ -403,6 +403,7 @@ will be silently ignored and the defaults used.)
 
 Planned features for future versions:
 
+- Make greater use of response mocking in unit tests to reduce API calls
 - Adjust the way column names are handled by `imf_dataset` for
   cross-platform consistency with the Python sister library, `imfp`
 - Add support for including annotations with metadata:
